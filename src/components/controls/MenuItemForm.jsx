@@ -3,6 +3,12 @@ import { makeStyles } from "@mui/styles";
 import React, { useEffect } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useHistory } from "react-router";
+import FileUploadIcon from "@mui/icons-material/FileUpload";
+import { styled } from "@mui/system";
+
+const Input = styled("input")({
+  display: "none",
+});
 
 //                                  STYLING
 
@@ -14,7 +20,7 @@ const useStyle = makeStyles({
     height: "100vh",
   },
   Paper: {
-    width: "25rem",
+    width: "30rem",
     margin: "0.5rem",
     padding: "10px",
   },
@@ -32,8 +38,15 @@ const MenuItemForm = (props) => {
   const classes = useStyle();
   const history = useHistory();
 
-  const { menuItems, HandleChange, onClick, Errors } = props;
-  console.log(menuItems);
+  const {
+    menuItems,
+    HandleChange,
+    onClick,
+    Errors,
+    HandleImageChange,
+    menuItemImageName,
+    formName,
+  } = props;
   const categories = [
     "Desi",
     "FastFood",
@@ -59,7 +72,7 @@ const MenuItemForm = (props) => {
             <ArrowBackIcon />
           </Button>
           <h1 style={{ textAlign: "center", marginBottom: "1.5rem" }}>
-            Add Item
+            {formName}
           </h1>
           {/*                    FORM                           */}
 
@@ -123,6 +136,30 @@ const MenuItemForm = (props) => {
                   Errors.priceError ? "price should be greater than 0" : ""
                 }
               />
+            </Grid>
+            <Grid item md={12} xs={12}>
+              <ul style={{ listStyleType: "none", display: "inline-block" }}>
+                <li style={{ display: "inline-block", marginRight: "3rem" }}>
+                  <label htmlFor="contained-button-file">
+                    <Input
+                      accept="image/*"
+                      id="contained-button-file"
+                      type="file"
+                      onChange={HandleImageChange}
+                    />
+                    <Button
+                      variant="contained"
+                      component="span"
+                      startIcon={<FileUploadIcon />}
+                    >
+                      Upload Image
+                    </Button>
+                  </label>
+                </li>
+                <li style={{ display: "inline-block" }}>
+                  <p>{menuItemImageName}</p>
+                </li>
+              </ul>
             </Grid>
           </Grid>
           <div className={classes.SubmitSection}>

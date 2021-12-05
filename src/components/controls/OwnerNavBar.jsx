@@ -1,10 +1,11 @@
 import { AppBar, Toolbar, Typography } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
 import { Button } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import Logo from "../../images/ByFoodLogo.png";
 import { useHistory } from "react-router";
 import { Link } from "react-router-dom";
+import OwnersService from "../../services/OwnerService";
 
 const useStyle = makeStyles({
   Toolbar: {
@@ -37,6 +38,20 @@ const useStyle = makeStyles({
 const OwnerNavbar = (props) => {
   const classes = useStyle();
   const history = useHistory();
+  const [owner, setOwner] = React.useState([]);
+
+  useEffect(() => {
+    const getOwner = async () => {
+      const LoggedInOwner = await OwnersService.GetLoggedInUser();
+      if (!(OwnersService.isLoggedIn() && LoggedInOwner.data.role == "Owner")) {
+        history.push("/");
+      } else {
+        setOwner(LoggedInOwner.data.name);
+      }
+    };
+    getOwner();
+  }, []);
+
   return (
     <div className="Body">
       <AppBar style={{ backgroundColor: "white" }}>
@@ -66,7 +81,7 @@ const OwnerNavbar = (props) => {
               <li>
                 <span>
                   <Typography style={{ color: "black", fontSize: "1rem" }}>
-                    Welcome! Muhammad Faateh
+                    Welcome! {owner}
                   </Typography>
                 </span>
               </li>
@@ -78,7 +93,10 @@ const OwnerNavbar = (props) => {
                     color: "white",
                     fontSize: "10px",
                   }}
-                  onClick={() => history.push("/")}
+                  onClick={() => {
+                    OwnersService.OwnerLogOut();
+                    history.push("/");
+                  }}
                 >
                   Log Out
                 </Button>

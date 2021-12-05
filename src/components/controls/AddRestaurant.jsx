@@ -1,4 +1,5 @@
 import {
+  Button,
   Checkbox,
   FormControl,
   FormControlLabel,
@@ -11,7 +12,13 @@ import {
   TextField,
 } from "@mui/material";
 import { Box } from "@mui/system";
+import { styled } from "@mui/material/styles";
 import React from "react";
+import FileUploadIcon from "@mui/icons-material/FileUpload";
+
+const Input = styled("input")({
+  display: "none",
+});
 
 const AddRestaurant = (props) => {
   const {
@@ -20,6 +27,8 @@ const AddRestaurant = (props) => {
     secondChange,
     Errors,
     restaurantService,
+    HandleRestaurantImageChange,
+    restaurantImageName,
   } = props;
   const restaurantTypes = [
     "Desi Restaurant",
@@ -128,6 +137,30 @@ const AddRestaurant = (props) => {
                   </FormHelperText>
                 </FormControl>
               </Box>
+            </Grid>
+            <Grid item md={12} xs={12}>
+              <ul style={{ listStyleType: "none", display: "inline-block" }}>
+                <li style={{ display: "inline-block", marginRight: "3rem" }}>
+                  <label htmlFor="contained-button-file">
+                    <Input
+                      accept="image/*"
+                      id="contained-button-file"
+                      type="file"
+                      onChange={HandleRestaurantImageChange}
+                    />
+                    <Button
+                      variant="contained"
+                      component="span"
+                      startIcon={<FileUploadIcon />}
+                    >
+                      Upload Image
+                    </Button>
+                  </label>
+                </li>
+                <li style={{ display: "inline-block" }}>
+                  <p>{restaurantImageName}</p>
+                </li>
+              </ul>
             </Grid>
           </Grid>
         </div>

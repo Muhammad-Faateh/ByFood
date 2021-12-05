@@ -8,6 +8,10 @@ import DoneOutlinedIcon from "@mui/icons-material/DoneOutlined";
 import { Grid, Paper, TextField } from "@mui/material";
 import MenuTable from "../../controls/MenuTable";
 import { useParams } from "react-router-dom";
+import OwnersService from "../../../services/OwnerService";
+import RestaurantService from "../../../services/RestaurantService";
+import AnotherMenuTable from "../../controls/AnotherMenuTable";
+
 const useStyle = makeStyles({
   OuterContainer: {
     padding: "0px 5rem",
@@ -41,68 +45,31 @@ const useStyle = makeStyles({
 const Restaurant = () => {
   const classes = useStyle();
   const history = useHistory();
-  const params = useParams();
-  const restaurantDATA = {
-    restaurantID: 101,
-    restaurantName: params.name,
-    Address: "0000 , liberty market , Lahore",
-    type: "Fast Food",
-    DineIn: true,
-    TakeAway: true,
-    // picture : '',
-    MenuItems: [
-      {
-        menuId: 1,
-        name: "Karahi",
-        category: "Desi",
-        price: 500,
-        description:
-          "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Odit repellendus, necessitatibus fuga, excepturi molestias ad aperiam illum incidunt accusamus pariatur quaerat. Earum nihil porro culpa deserunt suscipit alias facilis voluptatum.",
-        picture: "picture comes here",
-      },
-      {
-        menuId: 2,
-        name: "Chicken Boti",
-        category: "BBQ",
-        price: 1000,
-        description: "It tastes lovely",
-        picture: "picture comes here",
-      },
-      {
-        menuId: 19,
-        name: "Fish",
-        category: "SeaFood",
-        price: 750,
-        description: "It tastes lovely",
-        picture: "picture comes here",
-      },
-      {
-        menuId: 13,
-        name: "Lasagnia",
-        category: "desi",
-        price: 650,
-        description: "It tastes lovely",
-        picture: "picture comes here",
-      },
-      {
-        menuId: 13,
-        name: "Chicken kebab",
-        category: "desi",
-        price: 650,
-        description: "It tastes lovely",
-        picture: "picture comes here",
-      },
-    ],
+  const { id } = useParams();
+
+  const [restaurantInfo, setInfo] = React.useState({});
+  const [search, setSearch] = React.useState("");
+
+  const getRestaurant = async () => {
+    const LoggedInOwner = await OwnersService.GetLoggedInUser();
+    RestaurantService.GetRestaurant(`restaurant/${id}`)
+      .then((response) => {
+        setInfo(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
-  const [restaurantInfo, setInfo] = React.useState(restaurantDATA);
-  const [search, setSearch] = React.useState("");
+  useEffect(() => {
+    getRestaurant();
+  }, []);
 
   return (
     <div>
       <OwnerNavbar />
       <img
-        src={SamplePicture}
+        src={restaurantInfo.image}
         alt="restaurant-image"
         style={{
           width: "100%",
@@ -116,15 +83,15 @@ const Restaurant = () => {
           <h1>{restaurantInfo.restaurantName}</h1>
           <p>
             <b>Address : </b>
-            {restaurantInfo.Address}
+            {restaurantInfo.address}
           </p>
           <p>
-            <b>Type :</b> {restaurantInfo.type}
+            <b>Type :</b> {restaurantInfo.restaurantType}
           </p>
           <h2>Services</h2>
           <ul>
             <li>
-              {restaurantInfo.DineIn ? (
+              {restaurantInfo.dineIn ? (
                 <DoneOutlinedIcon fontSize="small" color="success" />
               ) : (
                 <CloseOutlinedIcon fontSize="small" color="error" />
@@ -132,7 +99,7 @@ const Restaurant = () => {
               Dine-In
             </li>
             <li>
-              {restaurantInfo.TakeAway ? (
+              {restaurantInfo.takeAway ? (
                 <DoneOutlinedIcon fontSize="small" color="success" />
               ) : (
                 <CloseOutlinedIcon fontSize="small" color="error" />
@@ -162,13 +129,16 @@ const Restaurant = () => {
 
           {/*        Menu Table           */}
 
-          <div>
-            <MenuTable
-              searchItem={search}
-              MenuData={restaurantInfo.MenuItems}
-              Action={false}
-            />
-          </div>
+          {restaurantInfo.menu ? (
+            <div>
+              <AnotherMenuTable
+                searchItem={search}
+                MenuData={restaurantInfo.menu}
+              />
+            </div>
+          ) : (
+            <div>loading.....</div>
+          )}
         </Paper>
       </div>
     </div>

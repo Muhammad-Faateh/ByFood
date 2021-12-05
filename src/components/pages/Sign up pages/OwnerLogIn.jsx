@@ -20,6 +20,7 @@ import { useHistory } from "react-router";
 import MuiAlert from "@mui/material/Alert";
 import validator from "validator";
 import GlobalBreadCrumb from "../../controls/GlobalBreadCrumb";
+import OwnersService from "../../../services/OwnerService";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -67,6 +68,7 @@ const OwnerLogIn = () => {
   };
   //                             STATES
 
+  const [owners, setOwners] = React.useState([]);
   const [showPassword, setShowPassword] = React.useState(true);
   const [isAlert, setAlert] = React.useState({
     openAlert: false,
@@ -84,6 +86,12 @@ const OwnerLogIn = () => {
 
   //                             USEEFFECT
 
+  useEffect(() => {
+    OwnersService.getOwners("owners").then((response) => {
+      setOwners(response.data);
+    });
+  }, []);
+
   //                             METHODS
 
   const handleClickShowPassword = () => setShowPassword(!showPassword);
@@ -95,24 +103,37 @@ const OwnerLogIn = () => {
   //                             SUBMIT HANDLING
 
   const HandleSubmit = () => {
-    if (userInfo.email === "" || userInfo.password === "") {
+    if (!validator.isEmail(userInfo.email) || userInfo.password === "") {
       setAlert({
         error: true,
         openAlert: true,
         message: "Please fill in the form",
       });
-    } else if (!validator.isEmail(userInfo.email)) {
-      setError({ ...isError, emailError: true });
-    } else if (userInfo.password === "") {
-      setError({ ...isError, passwordError: true });
     } else {
-      setInfo({
-        password: "",
-        email: "",
-      });
-
-      // THE POST API COMES HEREEE . ALSO USE USEEFFECT
-      history.push("/myrestaurant");
+      if (!owners.map((owner) => owner.email).includes(userInfo.email)) {
+        setAlert({
+          error: true,
+          openAlert: true,
+          message: "This User is not Registered",
+        });
+      } else {
+        OwnersService.loginOwner("login", userInfo)
+          .then((response) => {
+            setInfo({
+              password: "",
+              email: "",
+            });
+            setError({ emailError: false, passwordError: false });
+            history.push("/myrestaurant");
+          })
+          .catch((error) => {
+            setAlert({
+              error: true,
+              openAlert: true,
+              message: "Password is incorrect",
+            });
+          });
+      }
     }
   };
 

@@ -12,6 +12,8 @@ import OneMenuItemAdd from "../../controls/OneMenuitemAdd";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import MuiAlert from "@mui/material/Alert";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import OwnersService from "../../../services/OwnerService";
+import RestaurantService from "../../../services/RestaurantService";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -44,6 +46,11 @@ const CreateRestaurant = () => {
     takeAway: false,
   });
 
+  const [restaurantImage, setRestaurantImage] = React.useState("");
+  const [restaurantImageName, setRestaurantImageName] = React.useState("");
+  const [menuImage, setMenuImage] = React.useState("");
+  const [menuImageName, setMenuImageName] = React.useState("");
+
   const [isError, setError] = React.useState({
     nameError: false,
     addressError: false,
@@ -68,8 +75,33 @@ const CreateRestaurant = () => {
     categoryError: false,
   });
 
+  //                                  USEEFFECT
+
+  React.useEffect(() => {
+    const getOwner = async () => {
+      const loggedInOwner = await OwnersService.GetLoggedInUser();
+      if (
+        !(OwnersService.isLoggedIn() && loggedInOwner.data.role === "Owner")
+      ) {
+        history.push("/");
+      } else if (loggedInOwner.data.restaurant !== undefined) {
+        history.push("/myrestaurant");
+      }
+    };
+    getOwner();
+  }, []);
+
   const HandleChange = (event) =>
     setItems({ ...menuItems, [event.target.name]: event.target.value });
+
+  const HandleRestaurantImageChange = (event) => {
+    setRestaurantImageName(event.target.files[0].name);
+    setRestaurantImage(event.target.files[0]);
+  };
+  const HandleMenuImageChange = (event) => {
+    setMenuImageName(event.target.files[0].name);
+    setMenuImage(event.target.files[0]);
+  };
 
   const HandleFirstChange = (event) => {
     setRestaurantInfo({
@@ -137,11 +169,60 @@ const CreateRestaurant = () => {
     }
   };
 
-  const FinishSubmit = () => {
-    // history.push("/myrestaurant");
-    console.log(restaurantinfo);
-    console.log(restaurantService);
-    console.log(menuItems);
+  const FinishSubmit = async () => {
+    const GetLoggedInOwner = await OwnersService.GetLoggedInUser();
+    const restaurant = {
+      restaurantName: restaurantinfo.restaurantName,
+      address: restaurantinfo.address,
+      restaurantType: restaurantinfo.restaurantType,
+      dineIn: restaurantService.dineIn,
+      takeAway: restaurantService.takeAway,
+    };
+
+    const formData = new FormData();
+    formData.append("file", restaurantImage);
+    formData.append("upload_preset", "ByFoodCloud");
+    formData.append("cloud_name", "faatehcloud");
+    const restRawData = await fetch(
+      "https://api.cloudinary.com/v1_1/faatehcloud/image/upload",
+      {
+        method: "post",
+        body: formData,
+      }
+    );
+    const orginalRestData = await restRawData.json();
+    restaurant.image = orginalRestData.secure_url;
+
+    const menuItem = {
+      foodName: menuItems.foodName,
+      description: menuItems.description,
+      price: menuItems.price,
+      category: menuItems.category,
+    };
+
+    const menuData = new FormData();
+    menuData.append("file", menuImage);
+    menuData.append("upload_preset", "ByFoodCloud");
+    menuData.append("cloud_name", "faatehcloud");
+    const rawData = await fetch(
+      "https://api.cloudinary.com/v1_1/faatehcloud/image/upload",
+      {
+        method: "post",
+        body: menuData,
+      }
+    );
+    const originalData = await rawData.json();
+    menuItem.image = originalData.secure_url;
+    const restaurantPackage = {
+      _id: GetLoggedInOwner.data._id,
+      restaurant,
+      menuItem,
+    };
+    RestaurantService.CreateRestaurantWithItem(
+      "restaurants",
+      restaurantPackage
+    );
+    history.push("/myrestaurant");
   };
 
   const HandleBack = () => {
@@ -177,6 +258,8 @@ const CreateRestaurant = () => {
             firstChange={HandleFirstChange}
             secondChange={HandleCheckChange}
             restaurantService={restaurantService}
+            HandleRestaurantImageChange={HandleRestaurantImageChange}
+            restaurantImageName={restaurantImageName}
           />
         );
       case 1:
@@ -186,6 +269,8 @@ const CreateRestaurant = () => {
               menuItems={menuItems}
               Errors={menuError}
               onChange={HandleChange}
+              HandleMenuImageChange={HandleMenuImageChange}
+              menuImageName={menuImageName}
             />
           </div>
         );

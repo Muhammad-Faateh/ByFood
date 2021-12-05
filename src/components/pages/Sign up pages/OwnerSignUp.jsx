@@ -26,6 +26,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useHistory } from "react-router";
 import MuiAlert from "@mui/material/Alert";
 import validator from "validator";
+import OwnersService from "../../../services/OwnerService";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -66,6 +67,7 @@ const OwnerSignUp = () => {
 
   const [showPassword, setShowPassword] = React.useState(true);
   const [showPassword2, setShowPassword2] = React.useState(true);
+  const [owners, setOwners] = React.useState([]);
   const [isAlert, setAlert] = React.useState({
     openAlert: false,
     error: false,
@@ -86,6 +88,11 @@ const OwnerSignUp = () => {
   });
 
   //                             USEEFFECT
+  useEffect(() => {
+    OwnersService.getOwners("owners").then((response) => {
+      setOwners(response.data);
+    });
+  }, []);
 
   //                             METHODS
 
@@ -114,10 +121,6 @@ const OwnerSignUp = () => {
       setError({ ...isError, nameError: true });
     } else if (!validator.isEmail(userInfo.email)) {
       setError({ ...isError, emailError: true });
-    } else if (userInfo.password === "") {
-      setError({ ...isError, passwordError: true });
-    } else if (userInfo.reEnter_password === "") {
-      setError({ ...isError, rePasswordError: true });
     } else if (userInfo.password !== userInfo.reEnter_password) {
       setAlert({
         openAlert: true,
@@ -125,17 +128,47 @@ const OwnerSignUp = () => {
         message: "Passwords do not match",
       });
     } else {
-      setInfo({
-        name: "",
-        password: "",
-        reEnter_password: "",
-        gender: "male",
-        email: "",
-      });
-
-      // THE POST API COMES HEREEE . ALSO USE USEEFFECT
-
-      setAlert({ error: false, openAlert: true });
+      if (owners.length == 0) {
+        setInfo({
+          name: "",
+          password: "",
+          reEnter_password: "",
+          gender: "male",
+          email: "",
+        });
+        OwnersService.registerOwner("signup", userInfo).catch((error) =>
+          console.log(error)
+        );
+        OwnersService.getOwners("owners").then((response) => {
+          setOwners(response.data);
+        });
+        setAlert({ error: false, openAlert: true });
+        setError({ ...isError, nameError: false, emailError: false });
+      } else {
+        if (owners.map((owner) => owner.email).includes(userInfo.email)) {
+          setAlert({
+            openAlert: true,
+            error: true,
+            message: "This user already exist",
+          });
+        } else {
+          setInfo({
+            name: "",
+            password: "",
+            reEnter_password: "",
+            gender: "male",
+            email: "",
+          });
+          OwnersService.registerOwner("signup", userInfo).catch((error) =>
+            console.log(error)
+          );
+          OwnersService.getOwners("owners").then((response) => {
+            setOwners(response.data);
+          });
+          setAlert({ error: false, openAlert: true });
+          setError({ ...isError, nameError: false, emailError: false });
+        }
+      }
     }
   };
 

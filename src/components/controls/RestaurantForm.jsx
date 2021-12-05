@@ -15,7 +15,12 @@ import { makeStyles } from "@mui/styles";
 import React, { useEffect } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useHistory } from "react-router";
-import { Box } from "@mui/system";
+import { Box, styled } from "@mui/system";
+import FileUploadIcon from "@mui/icons-material/FileUpload";
+
+const Input = styled("input")({
+  display: "none",
+});
 
 //                                  STYLING
 
@@ -51,6 +56,8 @@ const RestaurantForm = (props) => {
     HandleCheckChange,
     onClick,
     Errors,
+    HandleImageChange,
+    restaurantImageName,
   } = props;
 
   const restaurantTypes = [
@@ -165,6 +172,30 @@ const RestaurantForm = (props) => {
                   </FormHelperText>
                 </FormControl>
               </Box>
+            </Grid>
+            <Grid item md={12} xs={12}>
+              <ul style={{ listStyleType: "none", display: "inline-block" }}>
+                <li style={{ display: "inline-block", marginRight: "3rem" }}>
+                  <label htmlFor="contained-button-file">
+                    <Input
+                      accept="image/*"
+                      id="contained-button-file"
+                      type="file"
+                      onChange={HandleImageChange}
+                    />
+                    <Button
+                      variant="contained"
+                      component="span"
+                      startIcon={<FileUploadIcon />}
+                    >
+                      Upload Image
+                    </Button>
+                  </label>
+                </li>
+                <li style={{ display: "inline-block" }}>
+                  <p>{restaurantImageName}</p>
+                </li>
+              </ul>
             </Grid>
           </Grid>
           <div className={classes.SubmitSection}>

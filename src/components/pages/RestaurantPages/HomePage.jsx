@@ -9,6 +9,7 @@ import { Button, Grid, Paper, TextField } from "@mui/material";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import AddIcon from "@mui/icons-material/Add";
 import MenuTable from "../../controls/MenuTable";
+import OwnersService from "../../../services/OwnerService";
 const useStyle = makeStyles({
   OuterContainer: {
     display: "flex",
@@ -43,67 +44,32 @@ const useStyle = makeStyles({
 const RestaurantHomePage = () => {
   const classes = useStyle();
   const history = useHistory();
-  const restaurantDATA = {
-    restaurantID: 101,
-    restaurantName: "Bundu Khan",
-    Address: "0000 , liberty market , Lahore",
-    type: "Fast Food",
-    DineIn: true,
-    TakeAway: true,
-    // picture : '',
-    MenuItems: [
-      {
-        menuId: 1,
-        name: "Karahi",
-        category: "Desi",
-        price: 500,
-        description:
-          "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Odit repellendus, necessitatibus fuga, excepturi molestias ad aperiam illum incidunt accusamus pariatur quaerat. Earum nihil porro culpa deserunt suscipit alias facilis voluptatum.",
-        picture: "picture comes here",
-      },
-      {
-        menuId: 2,
-        name: "Chicken Boti",
-        category: "BBQ",
-        price: 1000,
-        description: "It tastes lovely",
-        picture: "picture comes here",
-      },
-      {
-        menuId: 19,
-        name: "Fish",
-        category: "SeaFood",
-        price: 750,
-        description: "It tastes lovely",
-        picture: "picture comes here",
-      },
-      {
-        menuId: 13,
-        name: "Lasagnia",
-        category: "desi",
-        price: 650,
-        description: "It tastes lovely",
-        picture: "picture comes here",
-      },
-      {
-        menuId: 13,
-        name: "Chicken kebab",
-        category: "desi",
-        price: 650,
-        description: "It tastes lovely",
-        picture: "picture comes here",
-      },
-    ],
-  };
 
-  const [restaurantInfo, setInfo] = React.useState(restaurantDATA);
+  const [restaurantInfo, setInfo] = React.useState({});
   const [search, setSearch] = React.useState("");
+
+  //                            USSEEFECT
+
+  useEffect(() => {
+    const getOwner = async () => {
+      const LoggedInOwner = await OwnersService.GetLoggedInUser();
+      if (!(OwnersService.isLoggedIn && LoggedInOwner.data.role === "Owner")) {
+        history.push("/");
+      } else if (LoggedInOwner.data.restaurant === undefined) {
+        history.push("/createrestaurant");
+      } else {
+        setInfo(LoggedInOwner.data.restaurant);
+        // console.log(LoggedInOwner.data.restaurant);
+      }
+    };
+    getOwner();
+  }, []);
 
   return (
     <div>
       <OwnerNavbar />
       <img
-        src={SamplePicture}
+        src={restaurantInfo.image}
         alt="restaurant-image"
         style={{
           width: "100%",
@@ -117,15 +83,15 @@ const RestaurantHomePage = () => {
           <h1>{restaurantInfo.restaurantName}</h1>
           <p>
             <b>Address : </b>
-            {restaurantInfo.Address}
+            {restaurantInfo.address}
           </p>
           <p>
-            <b>Type :</b> {restaurantInfo.type}
+            <b>Type :</b> {restaurantInfo.restaurantType}
           </p>
           <h2>Services</h2>
           <ul>
             <li>
-              {restaurantInfo.DineIn ? (
+              {restaurantInfo.dineIn ? (
                 <DoneOutlinedIcon fontSize="small" color="success" />
               ) : (
                 <CloseOutlinedIcon fontSize="small" color="error" />
@@ -133,7 +99,7 @@ const RestaurantHomePage = () => {
               Dine-In
             </li>
             <li>
-              {restaurantInfo.TakeAway ? (
+              {restaurantInfo.takeAway ? (
                 <DoneOutlinedIcon fontSize="small" color="success" />
               ) : (
                 <CloseOutlinedIcon fontSize="small" color="error" />
@@ -195,7 +161,7 @@ const RestaurantHomePage = () => {
           <div>
             <MenuTable
               searchItem={search}
-              MenuData={restaurantInfo.MenuItems}
+              MenuData={restaurantInfo.menu}
               Action={true}
             />
           </div>

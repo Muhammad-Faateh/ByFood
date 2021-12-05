@@ -1,9 +1,15 @@
-import { Grid, MenuItem, Paper, TextField } from "@mui/material";
+import { Button, Grid, MenuItem, Paper, TextField } from "@mui/material";
 import React from "react";
+import FileUploadIcon from "@mui/icons-material/FileUpload";
+import { styled } from "@mui/styles";
+
+const Input = styled("input")({
+  display: "none",
+});
 
 const OneMenuItemAdd = (props) => {
-  console.log(props);
-  const { Errors, menuItems, onChange } = props;
+  const { Errors, menuItems, onChange, HandleMenuImageChange, menuImageName } =
+    props;
   const categories = [
     "Desi",
     "FastFood",
@@ -82,6 +88,30 @@ const OneMenuItemAdd = (props) => {
                   Errors.priceError ? "price should be greater than 0" : ""
                 }
               />
+            </Grid>
+            <Grid item md={12} xs={12}>
+              <ul style={{ listStyleType: "none", display: "inline-block" }}>
+                <li style={{ display: "inline-block", marginRight: "3rem" }}>
+                  <label htmlFor="contained-button-file">
+                    <Input
+                      accept="image/*"
+                      id="contained-button-file"
+                      type="file"
+                      onChange={HandleMenuImageChange}
+                    />
+                    <Button
+                      variant="contained"
+                      component="span"
+                      startIcon={<FileUploadIcon />}
+                    >
+                      Upload Image
+                    </Button>
+                  </label>
+                </li>
+                <li style={{ display: "inline-block" }}>
+                  <p>{menuImageName}</p>
+                </li>
+              </ul>
             </Grid>
           </Grid>
         </div>

@@ -19,6 +19,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useHistory } from "react-router";
 import MuiAlert from "@mui/material/Alert";
 import validator from "validator";
+import OwnersService from "../../../services/OwnerService";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -51,7 +52,7 @@ const OwnerForgotPassword = () => {
   const classes = useStyle();
   const history = useHistory();
   //                             STATES
-
+  const [owners, setOwners] = React.useState([]);
   const [showPassword, setShowPassword] = React.useState(true);
   const [showPassword2, setShowPassword2] = React.useState(true);
   const [isAlert, setAlert] = React.useState({
@@ -71,6 +72,11 @@ const OwnerForgotPassword = () => {
   });
 
   //                             USEEFFECT
+  useEffect(() => {
+    OwnersService.getOwners("owners").then((response) => {
+      setOwners(response.data);
+    });
+  }, []);
 
   //                             METHODS
 
@@ -103,18 +109,32 @@ const OwnerForgotPassword = () => {
         message: "Passwords do not match",
       });
     } else {
-      setInfo({
-        password: "",
-        reEnter_password: "",
-        email: "",
-      });
-      setError({
-        emailError: false,
-      });
+      if (!owners.map((owner) => owner.email).includes(userInfo.email)) {
+        setAlert({
+          openAlert: true,
+          error: true,
+          message: "User is not registered",
+        });
+      } else {
+        const filterOwner = owners.filter((owner) => {
+          if (owner.email == userInfo.email) {
+            return owner;
+          }
+        });
+        const ownerId = filterOwner[0]._id;
+        const url = `forgotpassword/${ownerId}`;
+        OwnersService.forgotPassword(url, userInfo);
 
-      // THE POST API COMES HEREEE . ALSO USE USEEFFECT
-
-      setAlert({ error: false, openAlert: true });
+        setInfo({
+          password: "",
+          reEnter_password: "",
+          email: "",
+        });
+        setError({
+          emailError: false,
+        });
+        setAlert({ error: false, openAlert: true });
+      }
     }
   };
 

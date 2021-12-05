@@ -6,13 +6,14 @@ import {
   Grid,
   Typography,
 } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
 import OwnerNavbar from "../../controls/OwnerNavBar";
 import samplePicture from "../../../images/samplePicture.jpg";
 import { makeStyles } from "@mui/styles";
 import { useHistory } from "react-router";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import DoneOutlinedIcon from "@mui/icons-material/DoneOutlined";
+import OwnersService from "../../../services/OwnerService";
 
 const useStyle = makeStyles({
   CardContent: {
@@ -34,44 +35,29 @@ const useStyle = makeStyles({
 const AllRestaurants = () => {
   const classes = useStyle();
   const history = useHistory();
-  const restaurants = [
-    {
-      name: "Bundu Khan",
-      type: "Pan Asian",
-      dine: true,
-      takeaway: true,
-    },
-    {
-      name: "Pan Masala",
-      type: "Pan Asian",
-      dine: true,
-      takeaway: true,
-    },
-    {
-      name: "Howdy",
-      type: "Pan Asian",
-      dine: true,
-      takeaway: true,
-    },
-    {
-      name: "Arcadian Cafe",
-      type: "Pan Asian",
-      dine: true,
-      takeaway: true,
-    },
-    {
-      name: "Bistro Cafe",
-      type: "Pan Asian",
-      dine: true,
-      takeaway: true,
-    },
-    {
-      name: "The Skyee",
-      type: "Pan Asian",
-      dine: true,
-      takeaway: true,
-    },
-  ];
+  const [restaurants, setRestaurants] = React.useState([]);
+
+  useEffect(() => {
+    const getOwner = async () => {
+      const LoggedInOwner = await OwnersService.GetLoggedInUser();
+      if (!(OwnersService.isLoggedIn() && LoggedInOwner.data.role == "Owner")) {
+        history.push("/");
+      } else {
+        OwnersService.getOwners("owners")
+          .then((response) => {
+            const AllRestaurants = response.data
+              .map((owner) => owner.restaurant)
+              .filter((restaurant) => restaurant !== undefined);
+            setRestaurants(AllRestaurants);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+    };
+    getOwner();
+  }, []);
+
   return (
     <div>
       <OwnerNavbar />
@@ -80,18 +66,18 @@ const AllRestaurants = () => {
         <Grid container spacing={3}>
           {restaurants.map((restaurant, index) => {
             return (
-              <Grid item xs={4}>
+              <Grid item xs={4} key={index}>
                 <Card
                   sx={{ width: "100%" }}
                   onClick={() =>
-                    history.push(`/allrestaurants/${restaurant.name}`)
+                    history.push(`/allrestaurants/${restaurant._id}`)
                   }
                 >
                   <CardActionArea>
                     <CardMedia
                       component="img"
                       height="140"
-                      image={samplePicture}
+                      image={restaurant.image}
                       alt="restaurant picture"
                     />
                     <CardContent className={classes.CardContent}>
@@ -101,7 +87,7 @@ const AllRestaurants = () => {
                         component="div"
                         style={{ fontFamily: "'Lora', serif" }}
                       >
-                        {restaurant.name}
+                        {restaurant.restaurantName}
                       </Typography>
                       <Typography
                         gutterBottom
@@ -109,12 +95,12 @@ const AllRestaurants = () => {
                         component="div"
                         style={{ fontFamily: "'Lora', serif" }}
                       >
-                        {restaurant.type}
+                        {restaurant.restaurantType}
                       </Typography>
                       <ul className={classes.Services}>
                         <li>
                           <Typography style={{ fontFamily: "'Lora', serif" }}>
-                            {restaurant.dine ? (
+                            {restaurant.dineIn ? (
                               <DoneOutlinedIcon
                                 fontSize="small"
                                 color="success"
@@ -130,7 +116,7 @@ const AllRestaurants = () => {
                         </li>
                         <li>
                           <Typography style={{ fontFamily: "'Lora', serif" }}>
-                            {restaurant.takeaway ? (
+                            {restaurant.takeAway ? (
                               <DoneOutlinedIcon
                                 fontSize="small"
                                 color="success"

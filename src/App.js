@@ -1,5 +1,12 @@
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import React from "react";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Redirect,
+} from "react-router-dom";
 import UserHomePage from "./components/pages/CustomerPage/HomePage";
+
 import FaqPage from "./components/pages/HomePages/FaqPage";
 import HomePage from "./components/pages/HomePages/HomePage";
 import PrivacyPage from "./components/pages/HomePages/PrivacyPage";
@@ -7,6 +14,7 @@ import TermsPage from "./components/pages/HomePages/TermsPage";
 import AddMenuItem from "./components/pages/RestaurantPages/AddMenuitem";
 import AllRestaurants from "./components/pages/RestaurantPages/AllRestaurants";
 import CreateRestaurant from "./components/pages/RestaurantPages/CreateRestaurant";
+import EditMenuItem from "./components/pages/RestaurantPages/EditMenuitem";
 import EditRestaurant from "./components/pages/RestaurantPages/EditRestaurant";
 import RestaurantHomePage from "./components/pages/RestaurantPages/HomePage";
 import Posts from "./components/pages/RestaurantPages/Posts";
@@ -17,6 +25,7 @@ import OwnerSignUp from "./components/pages/Sign up pages/OwnerSignUp";
 import UserForgotPassword from "./components/pages/Sign up pages/UserForgotPassword";
 import UserLogIn from "./components/pages/Sign up pages/UserLogIn";
 import UserSignUp from "./components/pages/Sign up pages/UserSignUp";
+import OwnersService from "./services/OwnerService";
 
 function App() {
   return (
@@ -49,8 +58,9 @@ function App() {
         <Route path="/editrestaurant" exact component={EditRestaurant} />
         <Route path="/myrestaurant" exact component={RestaurantHomePage} />
         <Route path="/allrestaurants" exact component={AllRestaurants} />
-        <Route path="/allrestaurants/:name" exact component={Restaurant} />
+        <Route path="/allrestaurants/:id" exact component={Restaurant} />
         <Route path="/addmenuitem" exact component={AddMenuItem} />
+        <Route path="/editmenuitem/:id" exact component={EditMenuItem} />
         <Route path="/posts" exact component={Posts} />
 
         {/*       USERS PAGES       */}

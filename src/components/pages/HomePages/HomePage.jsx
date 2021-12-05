@@ -206,7 +206,7 @@ const HomePage = () => {
         >
           {users.map((user, index) => {
             return (
-              <Grid item xs={4}>
+              <Grid item xs={4} key={index}>
                 <Card className={classes.Card}>
                   <Avatar
                     sx={{

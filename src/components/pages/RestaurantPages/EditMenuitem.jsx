@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useHistory } from "react-router";
+import { useHistory, useParams } from "react-router";
 import MenuItemForm from "../../controls/MenuItemForm";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
@@ -10,17 +10,43 @@ const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-const AddMenuItem = () => {
+const EditMenuItem = () => {
   const history = useHistory();
-
-  //                               STATES
+  const { id } = useParams();
 
   const [menuItems, setItems] = React.useState({
     foodName: "",
     description: "",
     category: "",
-    price: 0,
+    price: "",
   });
+  const [ownerid, setOwnerid] = React.useState("");
+
+  const getOwner = async () => {
+    const LoggedInOwner = await OwnersService.GetLoggedInUser();
+
+    if (!(OwnersService.isLoggedIn() && LoggedInOwner.data.role === "Owner")) {
+      history.push("/");
+    } else {
+      const ownerMenu = LoggedInOwner.data.restaurant.menu;
+      const menuArray = ownerMenu.filter((item) => item._id === id);
+      const menuitem = menuArray[0];
+      setItems({
+        foodName: menuitem.foodName,
+        description: menuitem.description,
+        category: menuitem.category,
+        price: menuitem.price,
+      });
+      setOwnerid(LoggedInOwner.data._id);
+    }
+  };
+
+  useEffect(() => {
+    getOwner();
+  }, []);
+
+  //                               STATES
+
   const [isError, setError] = React.useState({
     nameError: false,
     descriptionError: false,
@@ -34,20 +60,7 @@ const AddMenuItem = () => {
   });
   const [menuItemImageName, setMenuImageName] = React.useState("");
   const [menuItemImage, setMenuImage] = React.useState("");
-  const [ownerId, setOwnerId] = React.useState("");
 
-  const getOwner = async () => {
-    const LoggedInOwner = await OwnersService.GetLoggedInUser();
-    if (!(OwnersService.isLoggedIn() && LoggedInOwner.data.role === "Owner")) {
-      history.push("/");
-    } else {
-      setOwnerId(LoggedInOwner.data._id);
-    }
-  };
-
-  useEffect(() => {
-    getOwner();
-  }, []);
   //             METHODS
 
   const HandleCloseAlert = () => {
@@ -98,12 +111,11 @@ const AddMenuItem = () => {
       );
       const originalData = await rawData.json();
       menuItems.image = originalData.secure_url;
-      menuItems.ownerid = ownerId;
-      MenuService.CreateMenuItem("menuitems", menuItems).catch((error) => {
+      menuItems.ownerid = ownerid;
+      MenuService.EditMenuItem(`menuitems/${id}`, menuItems).catch((error) => {
         console.log(error);
       });
-      setMenuImage("");
-      setMenuImageName("");
+      console.log(menuItems);
       setItems({ foodName: "", description: "", category: "", price: 0 });
       setError({ ...isError, priceError: false });
       setAlert({
@@ -111,19 +123,21 @@ const AddMenuItem = () => {
         AlertSeverityError: false,
         AlertMessage: "Item successfully added",
       });
+      setMenuImageName("");
+      setMenuImage("");
     }
   };
   //            RETURN START
   return (
     <div>
       <MenuItemForm
+        formName={"Edit Item"}
         menuItems={menuItems}
         HandleChange={HandleChange}
         onClick={OnSubmit}
         Errors={isError}
         HandleImageChange={HandleImageChange}
         menuItemImageName={menuItemImageName}
-        formName={"Add Item"}
       />
       <Snackbar
         open={isALert.openAlert}
@@ -143,4 +157,4 @@ const AddMenuItem = () => {
   );
 };
 
-export default AddMenuItem;
+export default EditMenuItem;
