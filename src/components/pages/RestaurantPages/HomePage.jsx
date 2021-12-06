@@ -10,6 +10,7 @@ import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import AddIcon from "@mui/icons-material/Add";
 import MenuTable from "../../controls/MenuTable";
 import OwnersService from "../../../services/OwnerService";
+import AnotherMenuTable from "../../controls/AnotherMenuTable";
 const useStyle = makeStyles({
   OuterContainer: {
     display: "flex",
@@ -158,13 +159,16 @@ const RestaurantHomePage = () => {
 
           {/*        Menu Table           */}
 
-          <div>
-            <MenuTable
-              searchItem={search}
-              MenuData={restaurantInfo.menu}
-              Action={true}
-            />
-          </div>
+          {restaurantInfo.menu ? (
+            <div>
+              <AnotherMenuTable
+                searchItem={search}
+                MenuData={restaurantInfo.menu}
+              />
+            </div>
+          ) : (
+            <div>loading.....</div>
+          )}
         </Paper>
       </div>
     </div>
