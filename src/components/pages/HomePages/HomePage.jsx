@@ -9,8 +9,10 @@ import { useHistory } from "react-router";
 
 const useStyle = makeStyles({
   FirstSection: {
-    marginTop: "4rem",
     position: "relative",
+    height: "100vh",
+    background: `linear-gradient( rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7) ), url(https://res.cloudinary.com/faatehcloud/image/upload/v1638369859/fjixfwxkrbdwhzt46qqa.jpg)`,
+    backgroundSize: "cover",
   },
   InnerSection: {
     position: "absolute",
@@ -24,6 +26,7 @@ const useStyle = makeStyles({
     padding: "1rem",
     "& h1": {
       fontWeight: "700",
+      color: "white",
       "& span": {
         color: "#E0475B",
       },
@@ -31,6 +34,7 @@ const useStyle = makeStyles({
     "& p": {
       margin: "0.5rem 0px",
       fontSize: "1.5rem",
+      color: "white",
     },
     "& Button": {
       color: "white",
@@ -121,11 +125,17 @@ const HomePage = () => {
     <div>
       <HomeMenu divIDS={divIDS} />
       <div className={classes.FirstSection}>
-        <img
-          src={Background}
+        {/* <img
+          className={classes.BackgroundImage}
+          // src={Background}
           alt=""
-          style={{ width: "100%", maxHeight: "35rem", filter: "blur(2px)" }}
-        />
+          style={{
+            width: "100%",
+            height: "100vh",
+            // filter: "blur(2px)",
+            background: `linear-gradient( rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7) ), url(https://res.cloudinary.com/faatehcloud/image/upload/v1638369859/fjixfwxkrbdwhzt46qqa.jpg)`,
+          }}
+        /> */}
         <div className={classes.InnerSection}>
           <h1>
             Welcome to our By<span>FOOD</span>

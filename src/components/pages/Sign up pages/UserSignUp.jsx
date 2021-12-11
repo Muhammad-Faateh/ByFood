@@ -128,6 +128,17 @@ const UserSignUp = () => {
         gender: "male",
         email: "",
       });
+      fetch("http://localhost:4000/signup", {
+        method: "post",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userInfo),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          console.log(data);
+        });
 
       // THE POST API COMES HEREEE . ALSO USE USEEFFECT
 

@@ -74,7 +74,7 @@ const RestaurantHomePage = () => {
         alt="restaurant-image"
         style={{
           width: "100%",
-          maxHeight: "20rem",
+          maxHeight: "25rem",
           imageRendering: "pixelated",
         }}
       />
@@ -161,9 +161,10 @@ const RestaurantHomePage = () => {
 
           {restaurantInfo.menu ? (
             <div>
-              <AnotherMenuTable
+              <MenuTable
                 searchItem={search}
                 MenuData={restaurantInfo.menu}
+                Action={true}
               />
             </div>
           ) : (

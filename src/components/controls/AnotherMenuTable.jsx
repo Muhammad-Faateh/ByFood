@@ -10,6 +10,7 @@ import Paper from "@mui/material/Paper";
 import { TableSortLabel } from "@mui/material";
 import OwnersService from "../../services/OwnerService";
 import { useHistory } from "react-router";
+import UserService from "../../services/UserService";
 
 const AnotherMenuTable = (props) => {
   const { searchItem, MenuData } = props;
@@ -28,7 +29,13 @@ const AnotherMenuTable = (props) => {
 
   const getOwner = async () => {
     const GetloggedOwner = await OwnersService.GetLoggedInUser();
-    if (!(OwnersService.isLoggedIn() && GetloggedOwner.data.role === "Owner")) {
+    if (
+      !(
+        OwnersService.isLoggedIn() &&
+        (GetloggedOwner.data.role === "Owner" ||
+          UserService.GetLoggedInUser().role === "User")
+      )
+    ) {
       history.push("/");
     }
   };

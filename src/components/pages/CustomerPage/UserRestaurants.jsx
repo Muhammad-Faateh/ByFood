@@ -14,6 +14,8 @@ import { useHistory } from "react-router";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import DoneOutlinedIcon from "@mui/icons-material/DoneOutlined";
 import OwnersService from "../../../services/OwnerService";
+import UserService from "../../../services/UserService";
+import UserNavBar from "../../controls/UserNavBar";
 
 const useStyle = makeStyles({
   CardContent: {
@@ -32,15 +34,17 @@ const useStyle = makeStyles({
   },
 });
 
-const AllRestaurants = () => {
+const UserRestaurants = () => {
   const classes = useStyle();
   const history = useHistory();
   const [restaurants, setRestaurants] = React.useState([]);
 
   useEffect(() => {
     const getOwner = async () => {
-      const LoggedInOwner = await OwnersService.GetLoggedInUser();
-      if (!(OwnersService.isLoggedIn() && LoggedInOwner.data.role == "Owner")) {
+      if (
+        !UserService.isLoggedIn() &&
+        UserService.GetLoggedInUser().role === "Owner"
+      ) {
         history.push("/");
       } else {
         OwnersService.getOwners("owners")
@@ -60,7 +64,7 @@ const AllRestaurants = () => {
 
   return (
     <div>
-      <OwnerNavbar />
+      <UserNavBar />
       <div style={{ height: "6rem" }} />
       <div style={{ margin: "1rem 1rem" }}>
         <Grid container spacing={3}>
@@ -68,12 +72,8 @@ const AllRestaurants = () => {
             return (
               <Grid item xs={4} key={index}>
                 <Card
-                  sx={{
-                    width: "100%",
-                  }}
-                  onClick={() =>
-                    history.push(`/allrestaurants/${restaurant._id}`)
-                  }
+                  sx={{ width: "100%" }}
+                  onClick={() => history.push(`/restaurants/${restaurant._id}`)}
                 >
                   <CardActionArea>
                     <CardMedia
@@ -145,4 +145,4 @@ const AllRestaurants = () => {
   );
 };
 
-export default AllRestaurants;
+export default UserRestaurants;

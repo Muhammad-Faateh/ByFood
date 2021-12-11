@@ -19,6 +19,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useHistory } from "react-router";
 import MuiAlert from "@mui/material/Alert";
 import validator from "validator";
+import UserService from "../../../services/UserService";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -69,8 +70,15 @@ const UserForgotPassword = () => {
     passwordError: false,
     rePasswordError: false,
   });
+  const [users, setUsers] = React.useState();
 
   //                             USEEFFECT
+
+  useEffect(() => {
+    UserService.getUsers().then((response) => {
+      setUsers(response.data);
+    });
+  }, []);
 
   //                             METHODS
 
@@ -103,18 +111,33 @@ const UserForgotPassword = () => {
         message: "Passwords do not match",
       });
     } else {
-      setInfo({
-        password: "",
-        reEnter_password: "",
-        email: "",
-      });
-      setError({
-        emailError: false,
-      });
-
-      // THE POST API COMES HEREEE . ALSO USE USEEFFECT
-
-      setAlert({ error: false, openAlert: true });
+      if (!users.map((user) => user.email).includes(userInfo.email)) {
+        setAlert({
+          openAlert: true,
+          error: true,
+          message: "User is not registered",
+        });
+      } else {
+        const filterUser = users.filter((user) => {
+          if (user.email == userInfo.email) {
+            return user;
+          }
+        });
+        const userId = filterUser[0]._id;
+        const url = userId;
+        UserService.forgotPassword(url, userInfo).then((response) => {
+          console.log(response.data);
+          setInfo({
+            password: "",
+            reEnter_password: "",
+            email: "",
+          });
+          setError({
+            emailError: false,
+          });
+          setAlert({ ...isAlert, error: false, openAlert: true });
+        });
+      }
     }
   };
 

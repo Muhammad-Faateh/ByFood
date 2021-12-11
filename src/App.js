@@ -1,12 +1,6 @@
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import React from "react";
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Redirect,
-} from "react-router-dom";
-import UserHomePage from "./components/pages/CustomerPage/HomePage";
-
+import Profile from "./components/screens/Profile";
 import FaqPage from "./components/pages/HomePages/FaqPage";
 import HomePage from "./components/pages/HomePages/HomePage";
 import PrivacyPage from "./components/pages/HomePages/PrivacyPage";
@@ -17,7 +11,6 @@ import CreateRestaurant from "./components/pages/RestaurantPages/CreateRestauran
 import EditMenuItem from "./components/pages/RestaurantPages/EditMenuitem";
 import EditRestaurant from "./components/pages/RestaurantPages/EditRestaurant";
 import RestaurantHomePage from "./components/pages/RestaurantPages/HomePage";
-import Posts from "./components/pages/RestaurantPages/Posts";
 import Restaurant from "./components/pages/RestaurantPages/Restaurant";
 import OwnerForgotPassword from "./components/pages/Sign up pages/OwnerForgotPassword";
 import OwnerLogIn from "./components/pages/Sign up pages/OwnerLogIn";
@@ -25,7 +18,10 @@ import OwnerSignUp from "./components/pages/Sign up pages/OwnerSignUp";
 import UserForgotPassword from "./components/pages/Sign up pages/UserForgotPassword";
 import UserLogIn from "./components/pages/Sign up pages/UserLogIn";
 import UserSignUp from "./components/pages/Sign up pages/UserSignUp";
-import OwnersService from "./services/OwnerService";
+import UserRestaurants from "./components/pages/CustomerPage/UserRestaurants";
+import UserRestaurant from "./components/pages/CustomerPage/UserRestaurant";
+import UserPost from "./components/screens/UserPost";
+import OwnerPost from "./components/pages/RestaurantPages/OwnerPost";
 
 function App() {
   return (
@@ -61,10 +57,13 @@ function App() {
         <Route path="/allrestaurants/:id" exact component={Restaurant} />
         <Route path="/addmenuitem" exact component={AddMenuItem} />
         <Route path="/editmenuitem/:id" exact component={EditMenuItem} />
-        <Route path="/posts" exact component={Posts} />
+        <Route path="/posts" exact component={OwnerPost} />
 
         {/*       USERS PAGES       */}
-        <Route path="/userhome" exact component={UserHomePage} />
+        <Route path="/restaurants" exact component={UserRestaurants} />
+        <Route path="/restaurants/:id" exact component={UserRestaurant} />
+        <Route path="/profile" component={Profile} />
+        <Route path="/userpost" component={UserPost} />
       </Switch>
     </Router>
   );

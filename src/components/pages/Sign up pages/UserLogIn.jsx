@@ -106,13 +106,31 @@ const UserLogIn = () => {
     } else if (userInfo.password === "") {
       setError({ ...isError, passwordError: true });
     } else {
-      setInfo({
-        password: "",
-        email: "",
-      });
+      
+      fetch("http://localhost:4000/signin", {
+        method: "post",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userInfo),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.error) {
+            setAlert({ openAlert: true, error: true, message: data.error });
+            // M.toast({ html: data.error, classes: "#c62828 red darken-3" });
+          } else {
+            localStorage.setItem("token", data.token);
+            localStorage.setItem("user", JSON.stringify(data.user));
+            setInfo({
+              password: "",
+              email: "",
+            });
+            history.push("/restaurants");
+          }
+        });
 
-      // THE POST API COMES HEREEE . ALSO USE USEEFFECT
-      history.push("/userhome");
+     
     }
   };
 

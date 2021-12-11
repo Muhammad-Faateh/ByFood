@@ -11,6 +11,7 @@ import { useParams } from "react-router-dom";
 import OwnersService from "../../../services/OwnerService";
 import RestaurantService from "../../../services/RestaurantService";
 import AnotherMenuTable from "../../controls/AnotherMenuTable";
+import UserNavBar from "../../controls/UserNavBar";
 
 const useStyle = makeStyles({
   OuterContainer: {
@@ -42,7 +43,7 @@ const useStyle = makeStyles({
   },
 });
 
-const Restaurant = () => {
+const UserRestaurant = () => {
   const classes = useStyle();
   const history = useHistory();
   const { id } = useParams();
@@ -67,13 +68,13 @@ const Restaurant = () => {
 
   return (
     <div>
-      <OwnerNavbar />
+      <UserNavBar />
       <img
         src={restaurantInfo.image}
         alt="restaurant-image"
         style={{
           width: "100%",
-          maxHeight: "25rem",
+          maxHeight: "20rem",
           imageRendering: "pixelated",
         }}
       />
@@ -145,4 +146,4 @@ const Restaurant = () => {
   );
 };
 
-export default Restaurant;
+export default UserRestaurant;
