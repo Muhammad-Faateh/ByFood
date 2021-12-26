@@ -6,12 +6,13 @@ import Background from "../../../images/homeBackground.jpg";
 import AboutImage from "../../../images/AboutPage.png";
 import HomeFooter from "../../controls/HomeFooter";
 import { useHistory } from "react-router";
+import MissionImage from "../../../images/mission.jpg";
 
 const useStyle = makeStyles({
   FirstSection: {
     position: "relative",
     height: "100vh",
-    background: `linear-gradient( rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7) ), url(https://res.cloudinary.com/faatehcloud/image/upload/v1638369859/fjixfwxkrbdwhzt46qqa.jpg)`,
+    background: `linear-gradient( rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7) ), url(https://res.cloudinary.com/faatehcloud/image/upload/v1639118624/ax2ool1qebvkoniernqo.jpg)`,
     backgroundSize: "cover",
   },
   InnerSection: {
@@ -55,6 +56,7 @@ const useStyle = makeStyles({
         marginBottom: "2rem",
         fontSize: "3rem",
         textAlign: "center",
+        color: "#E0475B",
       },
       "& p": {
         fontSize: "1.2rem",
@@ -125,17 +127,6 @@ const HomePage = () => {
     <div>
       <HomeMenu divIDS={divIDS} />
       <div className={classes.FirstSection}>
-        {/* <img
-          className={classes.BackgroundImage}
-          // src={Background}
-          alt=""
-          style={{
-            width: "100%",
-            height: "100vh",
-            // filter: "blur(2px)",
-            background: `linear-gradient( rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7) ), url(https://res.cloudinary.com/faatehcloud/image/upload/v1638369859/fjixfwxkrbdwhzt46qqa.jpg)`,
-          }}
-        /> */}
         <div className={classes.InnerSection}>
           <h1>
             Welcome to our By<span>FOOD</span>
@@ -197,7 +188,11 @@ const HomePage = () => {
             </Grid>
             <Grid item xs={12} md={6} className={classes.LeftSection}>
               <div>
-                <img src={AboutImage} alt="" />
+                <img
+                  src={MissionImage}
+                  style={{ width: "25rem", height: "20rem" }}
+                  alt=""
+                />
               </div>
             </Grid>
           </Grid>
@@ -208,7 +203,9 @@ const HomePage = () => {
         id={divIDS.contact}
         style={{ marginTop: "1rem", margin: "0px , 10rem" }}
       >
-        <h1 style={{ textAlign: "center", fontSize: "3rem" }}>Contact Us</h1>
+        <h1 style={{ textAlign: "center", fontSize: "3rem", color: "#E0475B" }}>
+          Contact Us
+        </h1>
         <Grid
           container
           spacing={0}

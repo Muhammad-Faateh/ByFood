@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import UserNavBar from "../controls/UserNavBar";
+import UserNavBar from "../../controls/UserNavBar";
 import { makeStyles } from "@mui/styles";
-import PostTemplate from "../controls/PostTemplate";
-import UserService from "../../services/UserService";
+import PostTemplate from "../../controls/PostTemplate";
+import UserService from "../../../services/UserService";
 import { useHistory } from "react-router";
 import CreatePost from "./CreatePost";
 
@@ -84,51 +84,16 @@ const UserPost = () => {
   return (
     <div>
       <UserNavBar />
-      <div style={{ height: "5rem" }}></div>
-
-      <CreatePost GetAllPosts={GetAllPosts} />
-
+      <div style={{ height: "5rem" }}> </div>{" "}
+      <CreatePost GetAllPosts={GetAllPosts} />{" "}
       <div
         style={{
           display: "flex",
           justifyContent: "center",
         }}
       >
-        <PostTemplate posts={data} user={user} MakeComment={MakeComment} />
+        <PostTemplate posts={data} user={user} MakeComment={MakeComment} />{" "}
       </div>
-
-      {/* {data.map((item) => {
-        return (
-          <div className={classes.HomeCard} key={item._id}>
-            <div className="card-image">
-              <img src={item.photo} />
-            </div>
-            <div className="card-content">
-              <h6>{item.title}</h6>
-              <p>{item.body}</p>
-
-              {item.comments.map((record) => {
-                return (
-                  <h6 key={record._id}>
-                    <span style={{ fontWeight: "500" }}>
-                      {record.postedBy.name}
-                    </span>{" "}
-                    {record.text}
-                  </h6>
-                );
-              })}
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  MakeComment(e.target[0].value, item._id);
-                }}
-              >
-                <input type="text" placeholder="add a comment" />
-              </form>
-            </div>
-          </div>
-        );
-      })} */}
     </div>
   );
 };

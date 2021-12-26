@@ -5,12 +5,14 @@ import { makeStyles } from "@mui/styles";
 import { useHistory } from "react-router";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import DoneOutlinedIcon from "@mui/icons-material/DoneOutlined";
-import { Button, Grid, Paper, TextField } from "@mui/material";
+import { Button, Grid, Paper, Rating, TextField } from "@mui/material";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import AddIcon from "@mui/icons-material/Add";
 import MenuTable from "../../controls/MenuTable";
 import OwnersService from "../../../services/OwnerService";
 import AnotherMenuTable from "../../controls/AnotherMenuTable";
+import { Link } from "react-router-dom";
+import Loading from "../../controls/Loading";
 const useStyle = makeStyles({
   OuterContainer: {
     display: "flex",
@@ -48,130 +50,169 @@ const RestaurantHomePage = () => {
 
   const [restaurantInfo, setInfo] = React.useState({});
   const [search, setSearch] = React.useState("");
+  const [owner, setOwner] = React.useState([]);
+  const [restaurantRating, setRating] = React.useState(0);
+  const [loading, setloading] = React.useState(false);
 
-  //                            USSEEFECT
-
-  useEffect(() => {
-    const getOwner = async () => {
-      const LoggedInOwner = await OwnersService.GetLoggedInUser();
-      if (!(OwnersService.isLoggedIn && LoggedInOwner.data.role === "Owner")) {
+  const getOwner = async () => {
+    const LoggedInOwner = await OwnersService.GetLoggedInUser();
+    if (LoggedInOwner === undefined || LoggedInOwner === null) {
+      setloading(true);
+    } else {
+      setloading(false);
+      if (
+        !(OwnersService.isLoggedIn() && LoggedInOwner.data.role === "Owner")
+      ) {
         history.push("/");
       } else if (LoggedInOwner.data.restaurant === undefined) {
         history.push("/createrestaurant");
       } else {
         setInfo(LoggedInOwner.data.restaurant);
-        // console.log(LoggedInOwner.data.restaurant);
+        setOwner(LoggedInOwner.data);
+        setRating(LoggedInOwner.data.restaurant.rating);
       }
-    };
+    }
+  };
+
+  //                            USSEEFECT
+
+  useEffect(() => {
     getOwner();
-  }, []);
+  }, [loading]);
 
   return (
     <div>
-      <OwnerNavbar />
-      <img
-        src={restaurantInfo.image}
-        alt="restaurant-image"
-        style={{
-          width: "100%",
-          maxHeight: "25rem",
-          imageRendering: "pixelated",
-        }}
-      />
+      {loading ? (
+        <Loading />
+      ) : (
+        <div>
+          <OwnerNavbar />
 
-      <div className={classes.OuterContainer}>
-        <div className={classes.Container}>
-          <h1>{restaurantInfo.restaurantName}</h1>
-          <p>
-            <b>Address : </b>
-            {restaurantInfo.address}
-          </p>
-          <p>
-            <b>Type :</b> {restaurantInfo.restaurantType}
-          </p>
-          <h2>Services</h2>
-          <ul>
-            <li>
-              {restaurantInfo.dineIn ? (
-                <DoneOutlinedIcon fontSize="small" color="success" />
-              ) : (
-                <CloseOutlinedIcon fontSize="small" color="error" />
-              )}{" "}
-              Dine-In
-            </li>
-            <li>
-              {restaurantInfo.takeAway ? (
-                <DoneOutlinedIcon fontSize="small" color="success" />
-              ) : (
-                <CloseOutlinedIcon fontSize="small" color="error" />
-              )}{" "}
-              Take-Away
-            </li>
-          </ul>
-        </div>
-        <div className={classes.ButtonContainer}>
-          <Button
-            color="warning"
-            variant="contained"
-            startIcon={<EditOutlinedIcon />}
-            onClick={() => history.push("/editrestaurant")}
-          >
-            Edit
-          </Button>
-        </div>
-      </div>
-      <div className={classes.paperWrapper}>
-        <Paper elevation={3} className={classes.Paper}>
-          <Grid container>
-            <Grid item md={3} />
-            <Grid item md={4}>
-              <TextField
-                variant="outlined"
-                name="search"
-                type="search"
-                label="Search by name..."
-                style={{ width: "100%" }}
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-              />
-            </Grid>
-            <Grid item md={2} />
-            <Grid item md={3}>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  height: "100%",
-                }}
-              >
-                <Button
-                  color="primary"
-                  variant="contained"
-                  onClick={() => history.push("/addmenuitem")}
-                  startIcon={<AddIcon />}
+          <img
+            src={restaurantInfo.image}
+            alt="restaurant-image"
+            style={{
+              width: "100%",
+              maxHeight: "25rem",
+              imageRendering: "pixelated",
+            }}
+          />
+
+          <div className={classes.OuterContainer}>
+            <div className={classes.Container}>
+              <h1>{restaurantInfo.restaurantName}</h1>
+              <p>
+                <b>Address : </b>
+                {restaurantInfo.address}
+              </p>
+              <p>
+                <b>Type :</b> {restaurantInfo.restaurantType}
+              </p>
+              <p>
+                <b>Status: </b>{" "}
+                {owner.restaurantStatus ? (
+                  <span style={{ color: "green" }}>Approved</span>
+                ) : (
+                  <span style={{ color: "grey" }}>Waiting for Approval</span>
+                )}
+              </p>
+              <p style={{ margin: "10px 0px" }}>
+                <b>Rating: </b>
+                <Rating name="read-only" value={restaurantRating} readOnly />
+              </p>
+              <p>
+                <Link
+                  to="/myrestaurant/review"
+                  style={{ textDecoration: "none" }}
                 >
-                  Add Item
-                </Button>
-              </div>
-            </Grid>
-          </Grid>
-
-          {/*        Menu Table           */}
-
-          {restaurantInfo.menu ? (
-            <div>
-              <MenuTable
-                searchItem={search}
-                MenuData={restaurantInfo.menu}
-                Action={true}
-              />
+                  Go to Restaurant Reviews
+                </Link>
+              </p>
+              <h2>Services</h2>
+              <ul>
+                <li>
+                  {restaurantInfo.dineIn ? (
+                    <DoneOutlinedIcon fontSize="small" color="success" />
+                  ) : (
+                    <CloseOutlinedIcon fontSize="small" color="error" />
+                  )}{" "}
+                  Dine-In
+                </li>
+                <li>
+                  {restaurantInfo.takeAway ? (
+                    <DoneOutlinedIcon fontSize="small" color="success" />
+                  ) : (
+                    <CloseOutlinedIcon fontSize="small" color="error" />
+                  )}{" "}
+                  Take-Away
+                </li>
+              </ul>
             </div>
-          ) : (
-            <div>loading.....</div>
-          )}
-        </Paper>
-      </div>
+            <div className={classes.ButtonContainer}>
+              <Button
+                color="warning"
+                variant="contained"
+                startIcon={<EditOutlinedIcon />}
+                onClick={() => history.push("/editrestaurant")}
+              >
+                Edit
+              </Button>
+            </div>
+          </div>
+          <div className={classes.paperWrapper}>
+            <Paper elevation={3} className={classes.Paper}>
+              <Grid container>
+                <Grid item md={3} />
+                <Grid item md={4}>
+                  <TextField
+                    variant="outlined"
+                    name="search"
+                    type="search"
+                    label="Search by name..."
+                    style={{ width: "100%" }}
+                    value={search}
+                    onChange={(event) => setSearch(event.target.value)}
+                  />
+                </Grid>
+                <Grid item md={2} />
+                <Grid item md={3}>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      height: "100%",
+                    }}
+                  >
+                    <Button
+                      color="primary"
+                      variant="contained"
+                      onClick={() => history.push("/addmenuitem")}
+                      startIcon={<AddIcon />}
+                    >
+                      Add Item
+                    </Button>
+                  </div>
+                </Grid>
+              </Grid>
+
+              {/*        Menu Table           */}
+
+              {restaurantInfo.menu ? (
+                <div>
+                  <MenuTable
+                    searchItem={search}
+                    MenuData={restaurantInfo.menu}
+                    Action={true}
+                  />
+                </div>
+              ) : (
+                <div>loading.....</div>
+              )}
+            </Paper>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

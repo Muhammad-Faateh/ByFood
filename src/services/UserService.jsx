@@ -1,10 +1,6 @@
 import axios from "axios";
 import jwt_decode from "jwt-decode";
 
-axios.defaults.baseURL = "http://localhost:4000/api/owner/";
-// axios.defaults.headers.common["x-auth-token"] = localStorage.getItem("token");
-// axios.defaults.headers.common["Access-Control-Allow-Origin"] = "*";
-
 class User {
   constructor() {}
 

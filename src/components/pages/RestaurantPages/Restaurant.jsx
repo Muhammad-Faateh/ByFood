@@ -5,9 +5,9 @@ import { makeStyles } from "@mui/styles";
 import { useHistory } from "react-router";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import DoneOutlinedIcon from "@mui/icons-material/DoneOutlined";
-import { Grid, Paper, TextField } from "@mui/material";
+import { Grid, Paper, Rating, TextField } from "@mui/material";
 import MenuTable from "../../controls/MenuTable";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import OwnersService from "../../../services/OwnerService";
 import RestaurantService from "../../../services/RestaurantService";
 import AnotherMenuTable from "../../controls/AnotherMenuTable";
@@ -18,6 +18,10 @@ const useStyle = makeStyles({
     backgroundColor: "white",
   },
   Container: {
+    display: "flex",
+    justifyContent: "center",
+    flexDirection: "column",
+    alignItems: "center",
     padding: "10px",
     "& h1": {
       margin: "10px 0px",
@@ -49,12 +53,14 @@ const Restaurant = () => {
 
   const [restaurantInfo, setInfo] = React.useState({});
   const [search, setSearch] = React.useState("");
+  const [restaurantRating, setRating] = React.useState(0);
 
   const getRestaurant = async () => {
     const LoggedInOwner = await OwnersService.GetLoggedInUser();
     RestaurantService.GetRestaurant(`restaurant/${id}`)
       .then((response) => {
         setInfo(response.data);
+        setRating(response.data.rating);
       })
       .catch((error) => {
         console.log(error);
@@ -87,6 +93,18 @@ const Restaurant = () => {
           </p>
           <p>
             <b>Type :</b> {restaurantInfo.restaurantType}
+          </p>
+          <p style={{ margin: "10px 0px" }}>
+            <b>Rating: </b>
+            <Rating name="read-only" value={restaurantRating} readOnly />
+          </p>
+          <p>
+            <Link
+              to={`/allrestaurants/${id}/reviews`}
+              style={{ textDecoration: "none" }}
+            >
+              Go to Restaurant Reviews
+            </Link>
           </p>
           <h2>Services</h2>
           <ul>
@@ -133,7 +151,9 @@ const Restaurant = () => {
             <div>
               <AnotherMenuTable
                 searchItem={search}
-                MenuData={restaurantInfo.menu}
+                MenuData={restaurantInfo.menu.filter(
+                  (item) => item.status === "Approved"
+                )}
               />
             </div>
           ) : (

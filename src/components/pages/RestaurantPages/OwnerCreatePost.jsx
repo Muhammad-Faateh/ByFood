@@ -9,6 +9,7 @@ import FileUploadIcon from "@mui/icons-material/FileUpload";
 import { styled } from "@mui/system";
 import MuiAlert from "@mui/material/Alert";
 import OwnersService from "../../../services/OwnerService";
+import Loading from "../../controls/Loading";
 
 const Input = styled("input")({
   display: "none",
@@ -41,6 +42,7 @@ const OwnerCreatePost = (props) => {
       } else {
         setUser(LoggedInOwner.data.restaurant);
         setChar(LoggedInOwner.data.restaurant.restaurantName);
+        console.log(LoggedInOwner.data.restaurant);
       }
     };
     getOwner();
@@ -93,100 +95,104 @@ const OwnerCreatePost = (props) => {
 
   return (
     <div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          marginBottom: "2rem",
-        }}
-      >
-        <Paper elevation={3} style={{ width: "50rem", padding: "1rem" }}>
-          <Grid container spacing={2}>
-            <Grid
-              item
-              xs={1}
-              md={1}
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <Avatar sx={{ backgroundColor: "red" }} aria-label="recipe">
-                {getChar.charAt(0)}
-              </Avatar>
-            </Grid>
-            <Grid item xs={11} md={11}>
-              <span style={{ fontSize: "1.5rem" }}>
-                {getUser.restaurantName}
-              </span>
-            </Grid>
-            <Grid item xs={12} md={12}>
-              <TextField
-                label="Enter your status..."
-                multiline
-                rows={4}
-                fullWidth
-                value={body}
-                onChange={(event) => setBody(event.target.value)}
-              />
-            </Grid>
-            <Grid item md={10} xs={10}>
-              <ul style={{ listStyleType: "none", display: "inline-block" }}>
-                <li style={{ display: "inline-block", marginRight: "3rem" }}>
-                  <label htmlFor="contained-button-file">
-                    <Input
-                      accept="image/*"
-                      id="contained-button-file"
-                      type="file"
-                      onChange={(event) => {
-                        setImage(event.target.files[0]);
-                        setImageName(event.target.files[0].name);
-                      }}
-                    />
-                    <Button
-                      variant="contained"
-                      component="span"
-                      startIcon={<FileUploadIcon />}
-                    >
-                      Upload Image
-                    </Button>
-                  </label>
-                </li>
-                <li style={{ display: "inline-block" }}>
-                  <p>{imageName}</p>
-                </li>
-              </ul>
-            </Grid>
-            <Grid item md={2} xs={2}>
-              <Button
-                variant="contained"
-                style={{ width: "100%", backgroundColor: "#E0475B" }}
-                onClick={HandlePost}
-              >
-                Post
-              </Button>
-            </Grid>
-          </Grid>
-        </Paper>
-        <Snackbar
-          open={isAlert.openAlert}
-          autoHideDuration={2000}
-          anchorOrigin={{
-            vertical: "top",
-            horizontal: "center",
+      {!getUser || !getChar ? (
+        <Loading />
+      ) : (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            marginBottom: "2rem",
           }}
-          onClose={CloseAlert}
         >
-          <Alert
-            severity={isAlert.error ? "error" : "success"}
+          <Paper elevation={3} style={{ width: "50rem", padding: "1rem" }}>
+            <Grid container spacing={2}>
+              <Grid
+                item
+                xs={1}
+                md={1}
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Avatar sx={{ backgroundColor: "red" }} aria-label="recipe">
+                  {getChar.charAt(0)}
+                </Avatar>
+              </Grid>
+              <Grid item xs={11} md={11}>
+                <span style={{ fontSize: "1.5rem" }}>
+                  {getUser.restaurantName}
+                </span>
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <TextField
+                  label="Enter your status..."
+                  multiline
+                  rows={4}
+                  fullWidth
+                  value={body}
+                  onChange={(event) => setBody(event.target.value)}
+                />
+              </Grid>
+              <Grid item md={10} xs={10}>
+                <ul style={{ listStyleType: "none", display: "inline-block" }}>
+                  <li style={{ display: "inline-block", marginRight: "3rem" }}>
+                    <label htmlFor="contained-button-file">
+                      <Input
+                        accept="image/*"
+                        id="contained-button-file"
+                        type="file"
+                        onChange={(event) => {
+                          setImage(event.target.files[0]);
+                          setImageName(event.target.files[0].name);
+                        }}
+                      />
+                      <Button
+                        variant="contained"
+                        component="span"
+                        startIcon={<FileUploadIcon />}
+                      >
+                        Upload Image
+                      </Button>
+                    </label>
+                  </li>
+                  <li style={{ display: "inline-block" }}>
+                    <p>{imageName}</p>
+                  </li>
+                </ul>
+              </Grid>
+              <Grid item md={2} xs={2}>
+                <Button
+                  variant="contained"
+                  style={{ width: "100%", backgroundColor: "#E0475B" }}
+                  onClick={HandlePost}
+                >
+                  Post
+                </Button>
+              </Grid>
+            </Grid>
+          </Paper>
+          <Snackbar
+            open={isAlert.openAlert}
+            autoHideDuration={2000}
+            anchorOrigin={{
+              vertical: "top",
+              horizontal: "center",
+            }}
             onClose={CloseAlert}
           >
-            {isAlert.error ? isAlert.message : "post is successfully created"}
-          </Alert>
-        </Snackbar>
-      </div>
+            <Alert
+              severity={isAlert.error ? "error" : "success"}
+              onClose={CloseAlert}
+            >
+              {isAlert.error ? isAlert.message : "post is successfully created"}
+            </Alert>
+          </Snackbar>
+        </div>
+      )}
     </div>
   );
 };

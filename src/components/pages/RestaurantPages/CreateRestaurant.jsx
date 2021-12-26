@@ -14,6 +14,9 @@ import MuiAlert from "@mui/material/Alert";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import OwnersService from "../../../services/OwnerService";
 import RestaurantService from "../../../services/RestaurantService";
+import LinearProgress from '@mui/material/LinearProgress';
+import RestaurantModal from '../../controls/RestaurantModal'
+import Loading from "../../controls/Loading";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -74,12 +77,18 @@ const CreateRestaurant = () => {
     priceError: false,
     categoryError: false,
   });
-
-  //                                  USEEFFECT
-
-  React.useEffect(() => {
-    const getOwner = async () => {
-      const loggedInOwner = await OwnersService.GetLoggedInUser();
+  const [modal , setModal] = React.useState({
+    openModal : false,
+    title : '',
+    body : ''
+  })
+  const [loading , setLoading] = React.useState(false);
+  const getOwner = async () => {
+    const loggedInOwner = await OwnersService.GetLoggedInUser();
+    if(loggedInOwner === undefined || loggedInOwner === null){
+      setLoading(true)
+    }else{
+      setLoading(false)
       if (
         !(OwnersService.isLoggedIn() && loggedInOwner.data.role === "Owner")
       ) {
@@ -87,9 +96,19 @@ const CreateRestaurant = () => {
       } else if (loggedInOwner.data.restaurant !== undefined) {
         history.push("/myrestaurant");
       }
-    };
+
+    }
+    
+  };
+
+  //                                  USEEFFECT
+
+  React.useEffect(() => {
+    
     getOwner();
-  }, []);
+  }, [loading]);
+
+  const HandleCloseModal = ()=> setModal({...modal , openModal : false})
 
   const HandleChange = (event) =>
     setItems({ ...menuItems, [event.target.name]: event.target.value });
@@ -191,14 +210,7 @@ const CreateRestaurant = () => {
       }
     );
     const orginalRestData = await restRawData.json();
-    restaurant.image = orginalRestData.secure_url;
-
-    const menuItem = {
-      foodName: menuItems.foodName,
-      description: menuItems.description,
-      price: menuItems.price,
-      category: menuItems.category,
-    };
+    
 
     const menuData = new FormData();
     menuData.append("file", menuImage);
@@ -212,17 +224,33 @@ const CreateRestaurant = () => {
       }
     );
     const originalData = await rawData.json();
-    menuItem.image = originalData.secure_url;
+    
+      restaurant.image = orginalRestData.secure_url;
+
+    const menuItem = {
+      foodName: menuItems.foodName,
+      description: menuItems.description,
+      price: menuItems.price,
+      category: menuItems.category,
+    };
+      menuItem.image = originalData.secure_url;
     const restaurantPackage = {
       _id: GetLoggedInOwner.data._id,
       restaurant,
       menuItem,
     };
+
     RestaurantService.CreateRestaurantWithItem(
       "restaurants",
       restaurantPackage
-    );
-    history.push("/myrestaurant");
+    ).then((response)=>{
+      getOwner();
+      history.push("/myrestaurant");
+    });
+    
+
+
+    
   };
 
   const HandleBack = () => {
@@ -286,6 +314,7 @@ const CreateRestaurant = () => {
   };
   return (
     <div>
+      {loading ? <Loading /> : <div>
       <OwnerNavBar />
       <div style={{ padding: "5rem", marginTop: "1rem" }}>
         <Stepper activeStep={activeStep}>
@@ -298,7 +327,9 @@ const CreateRestaurant = () => {
           })}
         </Stepper>
 
-        <div className={classes.ContentSection}>{ShowContent()}</div>
+        {
+          <div className={classes.ContentSection}>{ShowContent()}</div>
+        }
 
         <div className={classes.ButtonSection}>
           <Grid container>
@@ -347,9 +378,12 @@ const CreateRestaurant = () => {
             {isALert.AlertMessage}
           </Alert>
         </Snackbar>
+        <RestaurantModal modal = {modal} HandleCloseModal = {HandleCloseModal} />
       </div>
+    </div>}
     </div>
+    
   );
-};
+};;
 
 export default CreateRestaurant;

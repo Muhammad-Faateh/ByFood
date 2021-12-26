@@ -75,7 +75,7 @@ const UserNavBar = (props) => {
                 </Link>
               </li>
               <li>
-                <Link to="/profile" className={classes.Link}>
+                <Link to="/userprofile" className={classes.Link}>
                   Profile
                 </Link>
               </li>

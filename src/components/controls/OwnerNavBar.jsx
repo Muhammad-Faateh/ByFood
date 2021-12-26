@@ -74,6 +74,11 @@ const OwnerNavbar = (props) => {
                   Posts
                 </Link>
               </li>
+              <li>
+                <Link to="/ownerprofile" className={classes.Link}>
+                  Profile
+                </Link>
+              </li>
             </ul>
           </div>
           <div className={classes.ButtonItems}>

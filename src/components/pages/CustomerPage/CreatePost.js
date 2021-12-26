@@ -4,7 +4,7 @@ import { useHistory } from "react-router-dom";
 import Paper from "@mui/material/Paper";
 import { Button, Grid, Snackbar, TextField } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
-import UserService from "../../services/UserService";
+import UserService from "../../../services/UserService";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 import { styled } from "@mui/system";
 import MuiAlert from "@mui/material/Alert";
