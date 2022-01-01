@@ -17,6 +17,8 @@ import OwnersService from "../../../services/OwnerService";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import PreviewIcon from "@mui/icons-material/Preview";
 import MenuService from "../../../services/MenuService";
+import MenuItemApprovalDialog from "./MenuItemApprovalDialog";
+import MenuItemRejectDialog from "./MenuItemRejectDialog";
 
 const useStyle = makeStyles({
   Body: {
@@ -38,6 +40,14 @@ const MenuApproval = () => {
   const classes = useStyle();
   const [owners, setOwner] = React.useState([]);
   const history = useHistory();
+  const [openDialog, setDialog] = React.useState(false);
+  const [ownerId, setOwnerId] = React.useState("");
+  const [ownerRole, setRole] = React.useState("");
+  const [itemID, setItemID] = React.useState("");
+  const [openRejectDialog, setRejectDialog] = React.useState(false);
+
+  const HandleCloseDialog = () => setDialog(false);
+  const HandleCloseRejectDialog = () => setRejectDialog(false);
 
   const getOwners = () => {
     OwnersService.getOwners("owners").then((response) => {
@@ -48,10 +58,6 @@ const MenuApproval = () => {
       const owners = owner.filter((owner) =>
         owner.restaurant.menu.filter((item) => item.status === "Pending")
       );
-
-      // const final_Array = owner
-      console.log(owners);
-      // console.log(final_Array);
       setOwner(owner);
     });
   };
@@ -168,12 +174,10 @@ const MenuApproval = () => {
                                       <li>
                                         <Button
                                           onClick={(event) => {
-                                            MenuService.ApproveMenuItem(
-                                              item._id,
-                                              { ownerID: owner._id }
-                                            ).then((response) => {
-                                              getOwners();
-                                            });
+                                            setDialog(true);
+                                            setOwnerId(owner._id);
+                                            setRole(owner.role);
+                                            setItemID(item._id);
                                           }}
                                           variant="outlined"
                                           color="success"
@@ -184,12 +188,10 @@ const MenuApproval = () => {
                                       <li>
                                         <Button
                                           onClick={(event) => {
-                                            MenuService.RejectMenuItem(
-                                              item._id,
-                                              { ownerID: owner._id }
-                                            ).then((response) => {
-                                              getOwners();
-                                            });
+                                            setRejectDialog(true);
+                                            setOwnerId(owner._id);
+                                            setRole(owner.role);
+                                            setItemID(item._id);
                                           }}
                                           variant="outlined"
                                           color="error"
@@ -209,6 +211,22 @@ const MenuApproval = () => {
                 </div>
               );
             })}
+            <MenuItemApprovalDialog
+              open={openDialog}
+              HandleCloseDialog={HandleCloseDialog}
+              ownerID={ownerId}
+              role={ownerRole}
+              getOwners={getOwners}
+              itemID={itemID}
+            />
+            <MenuItemRejectDialog
+              open={openRejectDialog}
+              HandleCloseDialog={HandleCloseRejectDialog}
+              ownerID={ownerId}
+              role={ownerRole}
+              getOwners={getOwners}
+              itemID={itemID}
+            />
           </Paper>
         </div>
       )}

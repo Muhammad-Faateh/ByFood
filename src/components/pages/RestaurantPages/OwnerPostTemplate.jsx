@@ -29,7 +29,7 @@ const CustomTextField = withStyles({
 
 const OwnerPostTemplate = (props) => {
   const { posts, user, MakeComment, restaurant } = props;
-  const [showButton, setButton] = React.useState(false);
+
   const reversePost = [...posts];
   const anotherposts = reversePost.reverse();
 
@@ -46,112 +46,130 @@ const OwnerPostTemplate = (props) => {
 
   return (
     <div>
-      {anotherposts.map((post, index) => {
-        return (
-          <Card style={{ width: "40rem", marginBottom: "3rem" }} key={index}>
-            <CardHeader
-              avatar={
-                <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
-                  {post.title.charAt(0)}
-                </Avatar>
-              }
-              title={post.title}
-              subheader={FormatDate(post.createdAt)}
-            />
-            <CardMedia
-              component="img"
-              height="250"
-              image={post.photo}
-              alt="photo"
-            />
-            <CardContent>
-              <Typography variant="body2" color="text.secondary">
-                <b>Status :</b> {post.body}
-              </Typography>
-            </CardContent>
-            <CardActions disableSpacing>
-              <IconButton aria-label="add to favorites">
-                <FavoriteIcon />
-              </IconButton>
-              <IconButton aria-label="share">
-                <ShareIcon />
-              </IconButton>
-            </CardActions>
+      {anotherposts
+        .filter((post) => post.status === "Approved")
+        .map((post, index) => {
+          return (
+            <Card style={{ width: "40rem", marginBottom: "3rem" }} key={index}>
+              <CardHeader
+                avatar={
+                  <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
+                    {post.title.charAt(0)}
+                  </Avatar>
+                }
+                title={post.title}
+                subheader={FormatDate(post.createdAt)}
+              />
+              <CardMedia
+                component="img"
+                height="250"
+                image={post.photo}
+                alt="photo"
+              />
+              <CardContent>
+                <Typography variant="body2" color="text.secondary">
+                  <b>Status :</b> {post.body}
+                </Typography>
+              </CardContent>
+              {user.restaurant !== undefined && (
+                <CardActions disableSpacing>
+                  <IconButton aria-label="add to favorites">
+                    <FavoriteIcon />
+                  </IconButton>
+                  <IconButton aria-label="share">
+                    <ShareIcon />
+                  </IconButton>
+                </CardActions>
+              )}
 
-            <CardContent>
-              <form
-                onSubmit={(event) => {
-                  event.preventDefault();
-                  MakeComment(
-                    event.target[0].value,
-                    post._id,
-                    restaurant.restaurantName
-                  );
-                  event.target[0].value = "";
-                }}
-              >
-                <Grid container spacing={1}>
-                  <Grid
-                    item
-                    xs={1}
-                    md={1}
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
+              {user.restaurant !== undefined && (
+                <CardContent>
+                  <form
+                    onSubmit={(event) => {
+                      event.preventDefault();
+                      MakeComment(
+                        event.target[0].value,
+                        post._id,
+                        restaurant.restaurantName
+                      );
+                      event.target[0].value = "";
                     }}
                   >
-                    <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
-                      {restaurant.restaurantName.charAt(0)}
-                    </Avatar>
-                  </Grid>
-                  <Grid item xs={10} md={10}>
-                    <CustomTextField label="Enter comment" variant="outlined" />
-                  </Grid>
-                  <Grid
-                    item
-                    xs={1}
-                    md={1}
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
-                    <IconButton type="submit">
-                      <SendIcon sx={{ color: "#E0475B" }} fontSize="large" />
-                    </IconButton>
-                  </Grid>
-                </Grid>
-              </form>
-            </CardContent>
-
-            {post.comments.map((comment, index1) => {
-              return (
-                <CardContent key={index1}>
-                  <Divider />
-                  <ul
-                    style={{
-                      listStyleType: "none",
-                      marginTop: "5px",
-                    }}
-                  >
-                    <li style={{ display: "inline-block", marginRight: "5px" }}>
-                      <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
-                        {comment.title.charAt(0)}
-                      </Avatar>
-                    </li>
-                    <li style={{ display: "inline-block", marginRight: "5px" }}>
-                      <b>{comment.title}: </b>
-                    </li>
-                    <li style={{ display: "inline-block" }}>{comment.text}</li>
-                  </ul>
+                    <Grid container spacing={1}>
+                      <Grid
+                        item
+                        xs={1}
+                        md={1}
+                        style={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
+                          {restaurant.restaurantName.charAt(0)}
+                        </Avatar>
+                      </Grid>
+                      <Grid item xs={10} md={10}>
+                        <CustomTextField
+                          label="Enter comment"
+                          variant="outlined"
+                        />
+                      </Grid>
+                      <Grid
+                        item
+                        xs={1}
+                        md={1}
+                        style={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        <IconButton type="submit">
+                          <SendIcon
+                            sx={{ color: "#E0475B" }}
+                            fontSize="large"
+                          />
+                        </IconButton>
+                      </Grid>
+                    </Grid>
+                  </form>
                 </CardContent>
-              );
-            })}
-          </Card>
-        );
-      })}
+              )}
+
+              {post.comments.map((comment, index1) => {
+                return (
+                  <CardContent key={index1}>
+                    <Divider />
+                    <ul
+                      style={{
+                        listStyleType: "none",
+                        marginTop: "5px",
+                      }}
+                    >
+                      <li
+                        style={{ display: "inline-block", marginRight: "5px" }}
+                      >
+                        <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
+                          {comment.title.charAt(0)}
+                        </Avatar>
+                      </li>
+                      <li
+                        style={{ display: "inline-block", marginRight: "5px" }}
+                      >
+                        <b>{comment.title}: </b>
+                      </li>
+                      <li style={{ display: "inline-block" }}>
+                        {comment.text}
+                      </li>
+                    </ul>
+                  </CardContent>
+                );
+              })}
+            </Card>
+          );
+        })}
     </div>
   );
 };

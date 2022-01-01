@@ -13,15 +13,27 @@ import {
 } from "@mui/material";
 import UserNavBar from "../../controls/UserNavBar";
 import { makeStyles } from "@mui/styles";
+import UserService from "../../../services/UserService";
 
 const useStyle = makeStyles({});
 
 const UserProfile = () => {
   const classes = useStyle();
   const history = useHistory();
+  const [user, setUser] = React.useState({});
 
   useEffect(() => {
-    // getRestaurant();
+    if (!UserService.isLoggedIn()) {
+      history.push("/");
+    } else {
+      UserService.getUsers().then((response) => {
+        const user = response.data.filter(
+          (user) => user._id === UserService.GetLoggedInUser()._id
+        );
+        setUser(user[0]);
+        console.log(user[0].notifications);
+      });
+    }
   }, []);
 
   return (
@@ -37,17 +49,20 @@ const UserProfile = () => {
             <Grid container spacing={3} style={{ marginTop: "1rem" }}>
               <Grid item xs={6} md={6}>
                 <p style={{ textAlign: "center", fontSize: "18px" }}>
-                  <b>Name: </b>Muhammad Faateh
+                  <b>Name: </b>
+                  {user.name}
                 </p>
               </Grid>
               <Grid item xs={6} md={6}>
                 <p style={{ textAlign: "center", fontSize: "18px" }}>
-                  <b>Gender: </b>Muhammad Faateh
+                  <b>Gender: </b>
+                  {user.gender}
                 </p>
               </Grid>
               <Grid item xs={12} md={12}>
                 <p style={{ textAlign: "center", fontSize: "18px" }}>
-                  <b>Email: </b>Muhammad Faateh
+                  <b>Email: </b>
+                  {user.email}
                 </p>
               </Grid>
             </Grid>
@@ -62,72 +77,21 @@ const UserProfile = () => {
               <TableContainer component={Paper}>
                 <Table sx={{ minWidth: 650 }} aria-label="simple table">
                   <TableBody>
-                    <TableRow
-                      key={0}
-                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                    >
-                      <TableCell component="th" scope="row">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                        Ea quidem mollitia eveniet alias, facilis laborum unde,
-                        est perspiciatis rem perferendis illo neque iste
-                        laboriosam maiores iusto quis minima magni eligendi.
-                      </TableCell>
-                    </TableRow>
-                    <TableRow
-                      key={0}
-                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                    >
-                      <TableCell component="th" scope="row">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                        Ea quidem mollitia eveniet alias, facilis laborum unde,
-                        est perspiciatis rem perferendis illo neque iste
-                        laboriosam maiores iusto quis minima magni eligendi.
-                      </TableCell>
-                    </TableRow>
-                    <TableRow
-                      key={0}
-                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                    >
-                      <TableCell component="th" scope="row">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                        Ea quidem mollitia eveniet alias, facilis laborum unde,
-                        est perspiciatis rem perferendis illo neque iste
-                        laboriosam maiores iusto quis minima magni eligendi.
-                      </TableCell>
-                    </TableRow>
-                    <TableRow
-                      key={0}
-                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                    >
-                      <TableCell component="th" scope="row">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                        Ea quidem mollitia eveniet alias, facilis laborum unde,
-                        est perspiciatis rem perferendis illo neque iste
-                        laboriosam maiores iusto quis minima magni eligendi.
-                      </TableCell>
-                    </TableRow>
-                    <TableRow
-                      key={0}
-                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                    >
-                      <TableCell component="th" scope="row">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                        Ea quidem mollitia eveniet alias, facilis laborum unde,
-                        est perspiciatis rem perferendis illo neque iste
-                        laboriosam maiores iusto quis minima magni eligendi.
-                      </TableCell>
-                    </TableRow>
-                    <TableRow
-                      key={0}
-                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                    >
-                      <TableCell component="th" scope="row">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                        Ea quidem mollitia eveniet alias, facilis laborum unde,
-                        est perspiciatis rem perferendis illo neque iste
-                        laboriosam maiores iusto quis minima magni eligendi.
-                      </TableCell>
-                    </TableRow>
+                    {user.notifications &&
+                      user.notifications.map((notif, index) => {
+                        return (
+                          <TableRow
+                            key={index}
+                            sx={{
+                              "&:last-child td, &:last-child th": { border: 0 },
+                            }}
+                          >
+                            <TableCell component="th" scope="row">
+                              {notif.message}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
                   </TableBody>
                 </Table>
               </TableContainer>

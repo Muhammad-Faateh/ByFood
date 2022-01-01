@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import SideNavigation from "../../controls/SideNavigation";
 import Divider from "@mui/material/Divider";
 import {
   Avatar,
+  Button,
   Card,
   CardActions,
   CardContent,
@@ -25,112 +26,90 @@ const useStyle = makeStyles({
 });
 const AdminPost = () => {
   const classes = useStyle();
+  const [posts, setPosts] = React.useState([]);
+  const reversePost = [...posts];
+  const anotherposts = reversePost.reverse();
+
+  const FormatDate = (createdAt) => {
+    var mydate = Date.parse(createdAt);
+    var date = new Date(mydate);
+    var result = date.toString("dddd MMMM yyyy");
+    if (result) {
+      if (result !== "Invalid Date") {
+        return result.slice(0, 15);
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetch("http://localhost:4000/api/allpost")
+      .then((res) => res.json())
+      .then((result) => {
+        console.log(result);
+        // setData(result);
+        setPosts(result);
+      });
+  });
   return (
     <div>
       <SideNavigation />
       <div className={classes.Body}>
-        <Card style={{ width: "40rem", marginBottom: "3rem" }}>
-          <CardHeader
-            avatar={
-              <Avatar sx={{ backgroundColor: "red" }} aria-label="recipe">
-                {/* {post.title.charAt(0)} */}
-              </Avatar>
-            }
-            //   title={post.title}
-            //   subheader={FormatDate(post.createdAt)}
-          />
-          <CardMedia
-            component="img"
-            height="250"
-            //   image={post.photo}
-            alt="photo"
-          />
-          <CardContent>
-            <Typography variant="body2" color="text.secondary">
-              {/* <b>Status :</b> {post.body} */}
-            </Typography>
-          </CardContent>
-          <CardActions disableSpacing>
-            <IconButton aria-label="add to favorites">
-              <FavoriteIcon />
-            </IconButton>
-            <IconButton aria-label="share">
-              <ShareIcon />
-            </IconButton>
-          </CardActions>
-
-          {/* <CardContent>
-              <form
-                onSubmit={(event) => {
-                  event.preventDefault();
-                  MakeComment(
-                    event.target[0].value,
-                    post._id,
-                    restaurant.restaurantName
-                  );
-                  event.target[0].value = "";
-                }}
-              >
-                <Grid container spacing={1}>
-                  <Grid
-                    item
-                    xs={1}
-                    md={1}
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
-                      {restaurant.restaurantName.charAt(0)}
-                    </Avatar>
-                  </Grid>
-                  <Grid item xs={10} md={10}>
-                    <CustomTextField label="Enter comment" variant="outlined" />
-                  </Grid>
-                  <Grid
-                    item
-                    xs={1}
-                    md={1}
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
-                    <IconButton type="submit">
-                      <SendIcon sx={{ color: "#E0475B" }} fontSize="large" />
-                    </IconButton>
-                  </Grid>
-                </Grid>
-              </form>
-            </CardContent> */}
-
-          {/* {post.comments.map((comment, index1) => {
-          return (
-            <CardContent key={index1}>
-              <Divider />
-              <ul
-                style={{
-                  listStyleType: "none",
-                  marginTop: "5px",
-                }}
-              >
-                <li style={{ display: "inline-block", marginRight: "5px" }}>
-                  <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
-                    {comment.title.charAt(0)}
-                  </Avatar>
-                </li>
-                <li style={{ display: "inline-block", marginRight: "5px" }}>
-                  <b>{comment.title}: </b>
-                </li>
-                <li style={{ display: "inline-block" }}>{comment.text}</li>
-              </ul>
-            </CardContent>
-          );
-        })} */}
-        </Card>
+        {anotherposts
+          .filter((post) => post.status === "Pending")
+          .map((post, index) => {
+            return (
+              <div key={index}>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    marginBottom: "0.5rem",
+                  }}
+                >
+                  <ul style={{ listStyleType: "none" }}>
+                    <li
+                      style={{ display: "inline-block", marginRight: "2.5rem" }}
+                    >
+                      <Button variant="contained" color="success">
+                        Accept
+                      </Button>
+                    </li>
+                    <li style={{ display: "inline-block" }}>
+                      <Button variant="contained" color="error">
+                        Reject
+                      </Button>
+                    </li>
+                  </ul>
+                </div>
+                <Card style={{ width: "40rem", marginBottom: "3rem" }}>
+                  <CardHeader
+                    avatar={
+                      <Avatar
+                        sx={{ backgroundColor: "red" }}
+                        aria-label="recipe"
+                      >
+                        {post.title.charAt(0)}
+                      </Avatar>
+                    }
+                    title={post.title}
+                    subheader={FormatDate(post.createdAt)}
+                  />
+                  <CardMedia
+                    component="img"
+                    height="250"
+                    image={post.photo}
+                    alt="photo"
+                  />
+                  <CardContent>
+                    <Typography variant="body2" color="text.secondary">
+                      <b>Status :</b> {post.body}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </div>
+            );
+          })}
       </div>
     </div>
   );

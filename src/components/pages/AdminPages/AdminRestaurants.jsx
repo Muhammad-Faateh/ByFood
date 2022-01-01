@@ -20,6 +20,7 @@ import SideNavigation from "../../controls/SideNavigation";
 import DeleteIcon from "@mui/icons-material/Delete";
 import RestaurantService from "../../../services/RestaurantService";
 import PreviewRoundedIcon from "@mui/icons-material/PreviewRounded";
+import RestaurantDeleteDialog from "./RestaurantDeleteDialog";
 
 const useStyle = makeStyles({
   Body: {
@@ -48,6 +49,11 @@ const AdminRestaurants = () => {
   const history = useHistory();
 
   const [owners, setOwners] = React.useState([]);
+  const [ownerID, setOwnerID] = React.useState("");
+  const [ownerRole, setownerRole] = React.useState("");
+  const [openDeleteDialog, setDeleteDialog] = React.useState(false);
+
+  const HandleDeleteDialog = () => setDeleteDialog(false);
   const getOwner = async () => {
     if (!AdminService.IsLoggedIn()) {
       history.push("/");
@@ -173,18 +179,9 @@ const AdminRestaurants = () => {
                                   color: "white",
                                 }}
                                 onClick={() => {
-                                  alert("Deleted");
-                                  RestaurantService.DeleteRestaurantPatch(
-                                    owner._id,
-                                    {
-                                      isDeleted: true,
-                                    }
-                                  );
-                                  RestaurantService.DeleteRestaurant(
-                                    owner._id
-                                  ).then((response) => {
-                                    getOwner();
-                                  });
+                                  setDeleteDialog(true);
+                                  setOwnerID(owner._id);
+                                  setownerRole(owner.role);
                                 }}
                               >
                                 <DeleteIcon />
@@ -198,6 +195,13 @@ const AdminRestaurants = () => {
                 );
               })}
             </Grid>
+            <RestaurantDeleteDialog
+              open={openDeleteDialog}
+              HandleCloseDialog={HandleDeleteDialog}
+              ownerID={ownerID}
+              role={ownerRole}
+              getOwners={getOwner}
+            />
           </div>
         </div>
       )}

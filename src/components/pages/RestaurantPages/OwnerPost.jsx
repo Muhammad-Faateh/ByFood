@@ -6,6 +6,7 @@ import OwnerCreatePost from "./OwnerCreatePost";
 import OwnerPostTemplate from "./OwnerPostTemplate";
 import OwnersService from "../../../services/OwnerService";
 import OwnerNavbar from "../../controls/OwnerNavBar";
+import Loading from "../../controls/Loading";
 
 const useStyle = makeStyles({
   HomeCard: {
@@ -29,21 +30,19 @@ const OwnerPost = () => {
         // console.log(result);
         setData(result);
       });
-    setUser(user);
-    setRestaurant(user.restaurant);
+  };
+  const getOwner = async () => {
+    const LoggedInOwner = await OwnersService.GetLoggedInUser();
+    if (!(OwnersService.isLoggedIn() && LoggedInOwner.data.role === "Owner")) {
+      history.push("/");
+    } else {
+      GetAllPosts(LoggedInOwner.data);
+      setUser(LoggedInOwner.data);
+      setRestaurant(LoggedInOwner.data.restaurant);
+    }
   };
 
   useEffect(() => {
-    const getOwner = async () => {
-      const LoggedInOwner = await OwnersService.GetLoggedInUser();
-      if (
-        !(OwnersService.isLoggedIn() && LoggedInOwner.data.role === "Owner")
-      ) {
-        history.push("/");
-      } else {
-        GetAllPosts(LoggedInOwner.data);
-      }
-    };
     getOwner();
   }, []);
 
@@ -88,11 +87,18 @@ const OwnerPost = () => {
 
   return (
     <div>
-      <div>Posts hain</div>
       <OwnerNavbar />
       <div style={{ height: "5rem" }}></div>
 
-      <OwnerCreatePost GetAllPosts={GetAllPosts} />
+      {user.restaurant === undefined ? (
+        <div>
+          <p style={{ textAlign: "center", margin: "2rem" }}>
+            Your restaurant is not created so you wont be able to post/comment
+          </p>
+        </div>
+      ) : (
+        <OwnerCreatePost GetAllPosts={GetAllPosts} user={user} />
+      )}
 
       <div
         style={{

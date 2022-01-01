@@ -19,7 +19,8 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 });
 
 const OwnerCreatePost = (props) => {
-  const { GetAllPosts } = props;
+  const { GetAllPosts, user } = props;
+  const { restaurant } = user;
   const history = useHistory();
   const [isAlert, setAlert] = React.useState({
     openAlert: false,
@@ -29,29 +30,12 @@ const OwnerCreatePost = (props) => {
   const [body, setBody] = useState("");
   const [image, setImage] = useState("");
   const [imageName, setImageName] = useState("");
-  const [getUser, setUser] = React.useState({});
-  const [getChar, setChar] = React.useState("");
 
-  useEffect(() => {
-    const getOwner = async () => {
-      const LoggedInOwner = await OwnersService.GetLoggedInUser();
-      if (
-        !(OwnersService.isLoggedIn() && LoggedInOwner.data.role === "Owner")
-      ) {
-        history.push("/");
-      } else {
-        setUser(LoggedInOwner.data.restaurant);
-        setChar(LoggedInOwner.data.restaurant.restaurantName);
-        console.log(LoggedInOwner.data.restaurant);
-      }
-    };
-    getOwner();
-  }, []);
   const CloseAlert = () => setAlert({ ...isAlert, openAlert: false });
 
   const HandlePost = async () => {
     const post = {};
-    post.title = getUser.restaurantName;
+    post.title = restaurant.restaurantName;
     post.body = body;
 
     const data = new FormData();
@@ -95,9 +79,7 @@ const OwnerCreatePost = (props) => {
 
   return (
     <div>
-      {!getUser || !getChar ? (
-        <Loading />
-      ) : (
+      {
         <div
           style={{
             display: "flex",
@@ -119,12 +101,12 @@ const OwnerCreatePost = (props) => {
                 }}
               >
                 <Avatar sx={{ backgroundColor: "red" }} aria-label="recipe">
-                  {getChar.charAt(0)}
+                  {restaurant.restaurantName.charAt(0)}
                 </Avatar>
               </Grid>
               <Grid item xs={11} md={11}>
                 <span style={{ fontSize: "1.5rem" }}>
-                  {getUser.restaurantName}
+                  {restaurant.restaurantName}
                 </span>
               </Grid>
               <Grid item xs={12} md={12}>
@@ -192,7 +174,7 @@ const OwnerCreatePost = (props) => {
             </Alert>
           </Snackbar>
         </div>
-      )}
+      }
     </div>
   );
 };
